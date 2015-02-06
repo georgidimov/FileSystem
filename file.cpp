@@ -1,7 +1,11 @@
 #include "file.h"
 
+///fix other instance variables
 File :: File(Value fileName){
     name = fileName;
+    size = 0;
+
+    time(&creationTime);
 }
 
 File :: File(const char * fileName){
@@ -22,4 +26,8 @@ File :: ~File(){
 
 Value File :: getName() const{
     return name;
+}
+
+Value File :: getCreationTime() const{
+    return Value( ctime(&creationTime) );
 }

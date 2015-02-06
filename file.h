@@ -1,4 +1,5 @@
 #pragma once
+#include <ctime>
 #include <value.h>
 
 class File{
@@ -18,5 +19,6 @@ public:
     ~File();
 
     Value getName() const;
+    Value getCreationTime() const;
 };
 
