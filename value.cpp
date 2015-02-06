@@ -4,12 +4,12 @@ Value :: Value(){
     value = NULL;
 }
 
-Value :: Value(char * passedValue){
+Value :: Value(const char * passedValue){
     value = new char[strlen(passedValue) + 1];
     strcpy(value, passedValue);
 }
 
-Value :: Value(char * passedValue, size_t end){
+Value :: Value(const char * passedValue, size_t end){
     value = new char[end + 1];
 
     for(size_t i = 0; i < end; ++i){

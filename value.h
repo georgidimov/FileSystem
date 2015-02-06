@@ -7,8 +7,8 @@ class Value{    ///Fix class name
     void clear();
 public:
     Value();
-    Value(char * passedValue);
-    Value(char * passedValue, size_t end);
+    Value(const char * passedValue);
+    Value(const char * passedValue, size_t end);
     Value(const Value & o);
     Value & operator=(const Value & o);
     ~Value();
