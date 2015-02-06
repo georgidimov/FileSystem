@@ -10,7 +10,7 @@ class File{
     size_t sizeInFileSystem;
 
     time_t creationTime;
-    time_t lastModified;
+    time_t lastModifiedTime;
 public:
     File(Value fileName);
     File(const char * fileName);
@@ -19,6 +19,12 @@ public:
     ~File();
 
     Value getName() const;
+    Value getContent() const;
+
     Value getCreationTime() const;
+    Value getLastModifiedTime() const;
+
+    size_t getSize() const;
+    size_t getSizeInFileSystem() const;
 };
 
