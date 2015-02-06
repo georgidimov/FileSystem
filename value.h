@@ -15,6 +15,7 @@ public:
 
     bool operator == (const Value & v) const;
     bool operator !=(const Value & v) const;
+    Value operator +(const Value & v) const;
 
     friend std :: ostream & operator << (std :: ostream & out, const Value & v);
 

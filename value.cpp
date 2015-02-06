@@ -57,6 +57,21 @@ bool Value :: operator !=(const Value & v) const{
     return !(*this == v);
 }
 
+Value Value :: operator +(const Value & v) const{
+    size_t newValueLength = strlen(value);
+    newValueLength += strlen(v.getValue());
+
+    char * newValue = new char[newValueLength + 1];
+    strcpy(newValue, value);
+    strcat(newValue, v.getValue());
+
+    Value concatenatedValue(newValue);
+
+    delete [] newValue;
+
+    return concatenatedValue;
+}
+
 std :: ostream & operator <<(std :: ostream & out, const Value & v){
     out << v.value;
 
