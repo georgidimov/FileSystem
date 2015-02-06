@@ -3,6 +3,7 @@
 ///fix other instance variables
 File :: File(Value fileName){
     name = fileName;
+    content = "";
     size = 0;
 
     time(&creationTime);
@@ -11,14 +12,31 @@ File :: File(Value fileName){
 
 File :: File(const char * fileName){
     name = Value(fileName);
+    content = "";
+    size = 0;
+
+    time(&creationTime);
+    time(&lastModifiedTime);
 }
 
 File :: File(const File & f){
-    ///add implementation
+    name = f.name;
+    content = f.content;
+    size = f.size;
+
+    time(&creationTime);
+    time(&lastModifiedTime);
 }
 
 File & File :: operator =(const File & f){
-    ///add implementation
+    name = f.name;
+    content = f.content;
+    size = f.size;
+
+    creationTime = f.creationTime;
+    time(&lastModifiedTime);
+
+    return * this;
 }
 
 File :: ~File(){
@@ -47,4 +65,18 @@ size_t File :: getSize() const{
 
 size_t File :: getSizeInFileSystem() const{
     return sizeInFileSystem;
+}
+
+void File :: setContent(Value newContent){
+    content = newContent;
+    size = strlen( newContent.getValue() ) * sizeof(char);
+
+    time(&lastModifiedTime);
+}
+
+void File :: append(Value data){
+    content = content + data;
+    size += strlen( data.getValue() ) * sizeof(char);
+
+    time(&lastModifiedTime);
 }

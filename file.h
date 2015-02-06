@@ -26,5 +26,8 @@ public:
 
     size_t getSize() const;
     size_t getSizeInFileSystem() const;
+
+    void setContent(Value newContent);
+    void append(Value data);
 };
 
