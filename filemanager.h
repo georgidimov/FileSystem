@@ -23,6 +23,7 @@ public:
     FileManager(std :: fstream & file, size_t fileBeginning);
     ~FileManager();
 
-    void write(const char * data, size_t size);
+    size_t write(const char * data, size_t size) const;
+    Value read(size_t position) const;
 };
 
