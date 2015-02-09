@@ -17,12 +17,15 @@ public:
     ~Cluster();
 
     void loadFromFile(std :: fstream & file, size_t position);
+    void writeToFile(std :: fstream & file, size_t position) const;
 
     Value getData() const;
+    size_t getDataSize() const;
     size_t getPrev() const;
     size_t getNext() const;
 
     void setData(Value newData);
+    void setDataSize(size_t newDataSize);
     void setPrev(size_t newPrev);
     void setNext(size_t newNext);
 };
