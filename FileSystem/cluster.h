@@ -17,7 +17,7 @@ public:
     ~Cluster();
 
     void loadFromFile(std :: fstream & file, size_t position);
-    void writeToFile(std :: fstream & file, size_t position) const;
+    size_t writeToFile(std :: fstream & file, size_t position) const;
 
     Value getData() const;
     size_t getDataSize() const;

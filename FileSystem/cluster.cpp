@@ -36,7 +36,7 @@ void Cluster :: loadFromFile(std::fstream & file, size_t position){
     dataFromFile = NULL;
 }
 
-void Cluster :: writeToFile(std::fstream & file, size_t position) const{
+size_t Cluster::writeToFile(std::fstream & file, size_t position) const{
     file.seekg(0, file.end);
     size_t lastPositionInFile = file.tellg();
 
@@ -44,7 +44,7 @@ void Cluster :: writeToFile(std::fstream & file, size_t position) const{
         throw std :: runtime_error("invalid position in file");
     }
 
-    //send file pointer to position for reading
+    //send file pointer to position for writing
     file.seekg(position);
 
     file.write((char *) & prevClusterPosition, sizeof(size_t));
@@ -52,6 +52,8 @@ void Cluster :: writeToFile(std::fstream & file, size_t position) const{
 
     file.write((char *) & dataSize, sizeof(size_t));
     file.write(data.getValue(), sizeof(char) * dataSize);
+
+    return file.tellg();
 }
 
 Value Cluster :: getData() const{
