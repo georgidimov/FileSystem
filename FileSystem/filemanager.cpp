@@ -72,27 +72,14 @@ Value FileManager :: read(size_t position) const{
 
     Value resultData = "";
 
-    char * data = new char[clusterSize];
-
-    size_t positionOfPrevCluster;
-    size_t positionOfNextCluster;
-    size_t dataSize;
-
+    Cluster tempCluster(clusterSize);
     //read every cluster and append data in resultData
     do{
-        sourceFile.read((char *) & positionOfPrevCluster, sizeof(size_t));
-        sourceFile.read((char *) & positionOfNextCluster, sizeof(size_t));
-        sourceFile.read((char *) & dataSize, sizeof(size_t));
-        sourceFile.read(data, dataSize * sizeof(char));
+        tempCluster.loadFromFile(sourceFile, position);
+        resultData = resultData + tempCluster.getData();
+        position = tempCluster.getNext();
 
-        resultData = resultData + Value(data, dataSize);
-
-        sourceFile.seekg(positionOfNextCluster);
-    }while(positionOfNextCluster > 0);
-
-
-    delete [] data;
-    data = NULL;
+    }while(position > 0);
 
     return resultData + Value("\0");
 }

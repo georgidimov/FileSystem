@@ -1,1 +1,11 @@
 build-FileSystem-Desktop-Debug/
+tests/Makefile
+tests/filemanager.o
+tests/moc_tst_filemanager.o
+tests/testRunner.o
+tests/tests
+tests/tests.pro.user
+tests/tst_filemanager.o
+tests/value.o
+tests/cluster.o
+tests/moc_tst_filemanager.cpp
