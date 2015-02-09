@@ -32,5 +32,7 @@ public:
 
     bool isValidCluster(std :: fstream & file, size_t position) const;
     void markAsInvalid(std :: fstream & file, size_t position) const;
+
+    bool isLastInSequence(std :: fstream & file, size_t position) const;
 };
 

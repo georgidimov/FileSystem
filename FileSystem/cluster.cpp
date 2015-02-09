@@ -126,7 +126,19 @@ void Cluster :: markAsInvalid(std::fstream &file, size_t position) const{
     int uselessVar = -1;
 
     file.write((char *) & uselessVar, sizeof(int));
+}
 
+bool Cluster :: isLastInSequence(std::fstream & file, size_t position) const{
+    if(!isValidPositionInFile(file, position)){
+        throw std :: runtime_error("invalid position in file");
+    }
 
+    //skip prev pointer
+    file.seekg(position);
 
+    size_t next;
+
+    file.read((char *) & next, sizeof(size_t));
+
+    return !next;
 }
