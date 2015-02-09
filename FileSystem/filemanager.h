@@ -10,8 +10,10 @@ class FileManager{
     std :: fstream & sourceFile;
     size_t clusterSize;
 
-
     size_t firstPositionInFile;
+//remove public
+public:
+    void replaceCluster(size_t position, size_t newPosition) const;
 public:
     FileManager(std :: fstream & file, size_t fileBeginning);
     ~FileManager();

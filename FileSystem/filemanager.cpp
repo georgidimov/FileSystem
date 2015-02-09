@@ -87,7 +87,7 @@ Value FileManager :: read(size_t position) const{
     return resultData + Value("\0");
 }
 
-void FileManager :: remove(size_t position) const{
+void FileManager :: replaceCluster(size_t position, size_t newPosition) const{
     sourceFile.seekg(0, sourceFile.end);
     size_t lastPositionInFile = sourceFile.tellg();
 
@@ -95,5 +95,31 @@ void FileManager :: remove(size_t position) const{
         throw std :: runtime_error("invalid position in file");
     }
 
+    Cluster currentCluster(clusterSize);
+    currentCluster.loadFromFile(sourceFile, position);
 
+    if(currentCluster.getNext() == newPosition){
+        throw std :: runtime_error("invalid position - loop in clusters sequence");
+    }
+
+    if(currentCluster.getPrev() == newPosition){
+        throw std :: runtime_error("invalid position - breaking clusters sequence");
+    }
+
+    currentCluster.writeToFile(sourceFile, newPosition);
+
+    size_t previousClusterPosition = currentCluster.getPrev();
+    currentCluster.loadFromFile(sourceFile, previousClusterPosition);
+
+    currentCluster.setNext(newPosition);
+    currentCluster.writeToFile(sourceFile, previousClusterPosition);
+}
+
+void FileManager :: remove(size_t position) const{
+    sourceFile.seekg(0, sourceFile.end);
+    size_t lastPositionInFile = sourceFile.tellg();
+
+    if(position > lastPositionInFile){
+        throw std :: runtime_error("invalid position in file");
+    }
 }
