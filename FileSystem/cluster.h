@@ -12,6 +12,7 @@ class Cluster{
 
     Value data;
     size_t dataSize;
+    bool isValidPositionInFile(std :: fstream & file, size_t position) const;
 public:
     Cluster(size_t clusterSize);
     ~Cluster();
@@ -28,5 +29,8 @@ public:
     void setDataSize(size_t newDataSize);
     void setPrev(size_t newPrev);
     void setNext(size_t newNext);
+
+    bool isValidCluster(std :: fstream & file, size_t position) const;
+    void markAsInvalid(std :: fstream & file, size_t position) const;
 };
 

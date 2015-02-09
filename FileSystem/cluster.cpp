@@ -11,11 +11,19 @@ Cluster :: ~Cluster(){
     ;
 }
 
-void Cluster :: loadFromFile(std::fstream & file, size_t position){
+bool Cluster :: isValidPositionInFile(std::fstream & file, size_t position) const{
     file.seekg(0, file.end);
     size_t lastPositionInFile = file.tellg();
 
     if(position > lastPositionInFile){
+        return false;
+    }
+
+    return true;
+}
+
+void Cluster :: loadFromFile(std::fstream & file, size_t position){
+    if(!isValidPositionInFile(file, position)){
         throw std :: runtime_error("invalid position in file");
     }
 
@@ -37,10 +45,7 @@ void Cluster :: loadFromFile(std::fstream & file, size_t position){
 }
 
 size_t Cluster::writeToFile(std::fstream & file, size_t position) const{
-    file.seekg(0, file.end);
-    size_t lastPositionInFile = file.tellg();
-
-    if(position > lastPositionInFile){
+    if(!isValidPositionInFile(file, position)){
         throw std :: runtime_error("invalid position in file");
     }
 
@@ -86,4 +91,42 @@ void Cluster :: setPrev(size_t newPrev){
 
 void Cluster :: setNext(size_t newNext){
     nextClusterPosition = newNext;
+}
+
+bool Cluster :: isValidCluster(std::fstream & file, size_t position) const{
+    if(!isValidPositionInFile(file, position)){
+        throw std :: runtime_error("invalid position in file");
+    }
+
+    //set pointer to rigth place
+    file.seekg(position);
+
+    //read previous and next cluster position
+    size_t uselessVariable;
+    file.read((char *) & uselessVariable, sizeof(size_t));
+    file.read((char *) & uselessVariable, sizeof(size_t));
+
+    int size;
+    file.read((char *) & size, sizeof(int));
+
+    if(size == -1){
+        return false;
+    }
+
+    return true;
+}
+
+void Cluster :: markAsInvalid(std::fstream &file, size_t position) const{
+    if(!isValidPositionInFile(file, position)){
+        throw std :: runtime_error("invalid position in file");
+    }
+
+    //skip prev and next pointer
+    file.seekg(position + 2 * sizeof(size_t));
+    int uselessVar = -1;
+
+    file.write((char *) & uselessVar, sizeof(int));
+
+
+
 }
