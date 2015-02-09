@@ -5,16 +5,7 @@
 #include <math.h>
 #include <value.h>
 #include <cluster.h>
-/*
-struct Cluster{
-    size_t size;
-    size_t clustersCount;
 
-    size_t prevClusterPosition;
-    size_t nextClusterPosition;
-
-};
-*/
 class FileManager{
     std :: fstream & sourceFile;
     size_t clusterSize;

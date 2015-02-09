@@ -28,6 +28,7 @@ size_t FileManager :: write(const char * data, size_t size) const{
     size_t prev = 0;
     size_t next = positionOfFirstCluster + clusterRealSize;
 
+    Cluster tempCluster(clusterSize);
     //for every cluster write position of previous, next,
     //size of storing data and data
     for(size_t i = 0; i < neededClusters; ++i){
@@ -43,17 +44,19 @@ size_t FileManager :: write(const char * data, size_t size) const{
             next = 0;
         }
 
-        sourceFile.write((char *) & prev, sizeof(size_t));
-        sourceFile.write((char *) & next, sizeof(size_t));
+        tempCluster.setData(data + i * clusterSize);
+        tempCluster.setDataSize(tempClusterSize);
+        tempCluster.setPrev(prev);
+        tempCluster.setNext(next);
 
-        sourceFile.write((char *) & tempClusterSize, sizeof(size_t));
-        sourceFile.write(data + i * clusterSize, sizeof(char) * tempClusterSize);
+        tempCluster.writeToFile(sourceFile, sourceFile.tellg());
 
         prev = next - clusterRealSize;
         next += clusterRealSize;
         tempSize -= tempClusterSize;
     }
 
+    //add zeros to the end of the cluster
     sourceFile.write((char *) &tempSize, (clusterSize - tempClusterSize) * sizeof(char));
 
     return positionOfFirstCluster;
