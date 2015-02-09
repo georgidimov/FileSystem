@@ -11,9 +11,8 @@ class FileManager{
     size_t clusterSize;
 
     size_t firstPositionInFile;
-//remove public
-public:
     void replaceCluster(size_t position, size_t newPosition) const;
+    bool isValidPositionInFile(size_t position) const;
 public:
     FileManager(std :: fstream & file, size_t fileBeginning);
     ~FileManager();

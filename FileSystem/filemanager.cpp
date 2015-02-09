@@ -15,6 +15,17 @@ FileManager :: ~FileManager(){
     ;
 }
 
+
+bool FileManager :: isValidPositionInFile(size_t position) const{
+    sourceFile.seekg(0, sourceFile.end);
+    size_t lastPositionInFile = sourceFile.tellg();
+
+    if(position > lastPositionInFile){
+        return false;
+    }
+
+    return true;
+}
 size_t FileManager :: write(const char * data, size_t size) const{
     //define count of clusters needed for saving data
     size_t neededClusters = ceil( (double)size / clusterSize );
@@ -63,10 +74,7 @@ size_t FileManager :: write(const char * data, size_t size) const{
 }
 
 Value FileManager :: read(size_t position) const{
-    sourceFile.seekg(0, sourceFile.end);
-    size_t lastPositionInFile = sourceFile.tellg();
-
-    if(position > lastPositionInFile){
+    if(!isValidPositionInFile(position)){
         throw std :: runtime_error("invalid position in file");
     }
 
@@ -88,10 +96,7 @@ Value FileManager :: read(size_t position) const{
 }
 
 void FileManager :: replaceCluster(size_t position, size_t newPosition) const{
-    sourceFile.seekg(0, sourceFile.end);
-    size_t lastPositionInFile = sourceFile.tellg();
-
-    if(position > lastPositionInFile){
+    if(!isValidPositionInFile(position)){
         throw std :: runtime_error("invalid position in file");
     }
 
@@ -106,6 +111,8 @@ void FileManager :: replaceCluster(size_t position, size_t newPosition) const{
         throw std :: runtime_error("invalid position - breaking clusters sequence");
     }
 
+    //write cluster to new place and fix next position in
+    //it`s previous cluster
     currentCluster.writeToFile(sourceFile, newPosition);
 
     size_t previousClusterPosition = currentCluster.getPrev();
@@ -122,4 +129,6 @@ void FileManager :: remove(size_t position) const{
     if(position > lastPositionInFile){
         throw std :: runtime_error("invalid position in file");
     }
+
+
 }
