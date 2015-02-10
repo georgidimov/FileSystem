@@ -6,10 +6,12 @@ FileManager :: FileManager(std :: fstream & file, size_t fileBeginning) : source
     }
 
     //make zero position unvailable
-    /*if(endOfFile() == 0){
+    if(endOfFile() == 0){
         size_t nil = 0;
-        sourceFile
-    }*/
+
+        sourceFile.seekg(0);
+        sourceFile.write((char *) & nil, sizeof(size_t));
+    }
 
     clusterSize = 4;
     clusterSizeInFS = 3 * sizeof(size_t) + clusterSize;
