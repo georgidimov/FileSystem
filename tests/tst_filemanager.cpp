@@ -16,8 +16,8 @@ void tst_FileManager :: testReading(){
 
 
 void tst_FileManager :: testWriting(){
-    std :: fstream sourceFile("files/source_file",
-                              std :: ios :: in | std :: ios :: out | std :: ios :: binary);
+    std :: fstream sourceFile("files/temp_file",
+                              std :: ios :: in | std :: ios :: out | std :: ios :: binary | std :: ios :: trunc);
     FileManager f(sourceFile, sourceFile.end);
 
     //check with random text and length
@@ -39,6 +39,4 @@ void tst_FileManager :: testWriting(){
     pos = f.write("", 1);
     result = f.read(pos).getValue();
     QCOMPARE(result, QString(""));
-
-
 }
