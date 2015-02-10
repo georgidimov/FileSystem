@@ -5,7 +5,11 @@ FileManager :: FileManager(std :: fstream & file, size_t fileBeginning) : source
         throw std :: runtime_error("wrong sourcefile path");
     }
 
-    //if()
+    //make zero position unvailable
+    /*if(endOfFile() == 0){
+        size_t nil = 0;
+        sourceFile
+    }*/
 
     clusterSize = 4;
     clusterSizeInFS = 3 * sizeof(size_t) + clusterSize;
@@ -27,8 +31,16 @@ void FileManager :: isValidPositionInFile(size_t position) const{
 }
 
 size_t FileManager :: endOfFile() const{
+    //save previous position, define end of file and
+    //send pointer back to previous position
+    size_t previousPosition = sourceFile.tellg();
+
     sourceFile.seekg(0, sourceFile.end);
-    return sourceFile.tellg();
+    size_t end = sourceFile.tellg();
+
+    sourceFile.seekg(previousPosition);
+
+    return end;
 }
 
 size_t FileManager :: write(const char * data, size_t size) const{
@@ -36,6 +48,8 @@ size_t FileManager :: write(const char * data, size_t size) const{
     size_t neededClusters = ceil( (double)size / clusterSize );
 
     size_t positionOfFirstCluster = endOfFile();
+    sourceFile.seekg(positionOfFirstCluster);
+
     size_t tempSize = size;
     size_t tempClusterSize = clusterSize;
     size_t clusterRealSize = sizeof(size_t) * 3 + tempClusterSize;
