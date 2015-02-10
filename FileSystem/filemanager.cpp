@@ -8,6 +8,8 @@ FileManager :: FileManager(std :: fstream & file, size_t fileBeginning) : source
     }
 
     clusterSize = 4;
+    clusterSizeInFS = 3 * sizeof(size_t) + clusterSize;
+
     firstPositionInFile = fileBeginning;
 }
 
@@ -16,15 +18,13 @@ FileManager :: ~FileManager(){
 }
 
 
-bool FileManager :: isValidPositionInFile(size_t position) const{
+void FileManager :: isValidPositionInFile(size_t position) const{
     sourceFile.seekg(0, sourceFile.end);
     size_t lastPositionInFile = sourceFile.tellg();
 
     if(position > lastPositionInFile){
-        return false;
+        throw std :: runtime_error("invalid position in file");
     }
-
-    return true;
 }
 size_t FileManager :: write(const char * data, size_t size) const{
     //define count of clusters needed for saving data
@@ -74,9 +74,7 @@ size_t FileManager :: write(const char * data, size_t size) const{
 }
 
 Value FileManager :: read(size_t position) const{
-    if(!isValidPositionInFile(position)){
-        throw std :: runtime_error("invalid position in file");
-    }
+    isValidPositionInFile(position);
 
     //send file pointer to position for reading
     sourceFile.seekg(position);
@@ -96,9 +94,7 @@ Value FileManager :: read(size_t position) const{
 }
 
 void FileManager :: replaceCluster(size_t position, size_t newPosition) const{
-    if(!isValidPositionInFile(position)){
-        throw std :: runtime_error("invalid position in file");
-    }
+    isValidPositionInFile(position);
 
     Cluster currentCluster(clusterSize);
     currentCluster.loadFromFile(sourceFile, position);
@@ -123,11 +119,51 @@ void FileManager :: replaceCluster(size_t position, size_t newPosition) const{
 }
 
 void FileManager :: remove(size_t position) const{
-    sourceFile.seekg(0, sourceFile.end);
-    size_t lastPositionInFile = sourceFile.tellg();
+    isValidPositionInFile(position);
 
-    if(position > lastPositionInFile){
-        throw std :: runtime_error("invalid position in file");
+
+    Cluster tempCluster(clusterSize);
+    tempCluster.loadFromFile(sourceFile, position);
+
+    if(!tempCluster.isValidCluster(sourceFile, position)){
+        throw std :: runtime_error("try to remove wrong cluster");
+    }
+
+    PriorityQueue<size_t> positionsOfClustersToRemove;
+    positionsOfClustersToRemove.enqueue(position);
+
+    //closest position to the end of the file
+    size_t maxPosition = position;
+    //closest position to the beginning of the file
+    size_t minPosition = position;
+
+    while (tempCluster.getNext() != 0) {
+        position = tempCluster.getNext();
+
+        tempCluster.loadFromFile(sourceFile, position);
+        positionsOfClustersToRemove.enqueue(position);
+
+        maxPosition = position > maxPosition ? position : maxPosition;
+        minPosition = position < minPosition ? position : minPosition;
+    }
+
+    //go to the last cluster in the file
+    sourceFile.seekg(0, sourceFile.end);
+
+    size_t positionOfLastCluster = sourceFile.tellg() - clusterSizeInFS;
+    tempCluster.loadFromFile(sourceFile, positionOfLastCluster);
+
+    size_t currentPosition = positionsOfClustersToRemove.dequeue();
+    tempCluster.loadFromFile(sourceFile, currentPosition);
+
+    while(!positionsOfClustersToRemove.isEmpty() && positionOfLastCluster > maxPosition){
+        replaceCluster(positionOfLastCluster, currentPosition);
+
+        tempCluster.loadFromFile(sourceFile, positionOfLastCluster);
+        positionOfLastCluster = tempCluster.getPrev();
+
+        currentPosition = positionsOfClustersToRemove.dequeue();
+        std :: cout << "cala";
     }
 
 
