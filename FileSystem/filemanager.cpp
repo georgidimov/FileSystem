@@ -1,11 +1,11 @@
 #include "filemanager.h"
 
 FileManager :: FileManager(std :: fstream & file, size_t fileBeginning) : sourceFile(file){
-
-
     if(!sourceFile.is_open()){
         throw std :: runtime_error("wrong sourcefile path");
     }
+
+    //if()
 
     clusterSize = 4;
     clusterSizeInFS = 3 * sizeof(size_t) + clusterSize;
@@ -19,20 +19,23 @@ FileManager :: ~FileManager(){
 
 
 void FileManager :: isValidPositionInFile(size_t position) const{
-    sourceFile.seekg(0, sourceFile.end);
-    size_t lastPositionInFile = sourceFile.tellg();
+    size_t lastPositionInFile = endOfFile();
 
     if(position > lastPositionInFile){
         throw std :: runtime_error("invalid position in file");
     }
 }
+
+size_t FileManager :: endOfFile() const{
+    sourceFile.seekg(0, sourceFile.end);
+    return sourceFile.tellg();
+}
+
 size_t FileManager :: write(const char * data, size_t size) const{
     //define count of clusters needed for saving data
     size_t neededClusters = ceil( (double)size / clusterSize );
 
-    sourceFile.seekg(0, sourceFile.end);
-    size_t positionOfFirstCluster = sourceFile.tellg();
-
+    size_t positionOfFirstCluster = endOfFile();
     size_t tempSize = size;
     size_t tempClusterSize = clusterSize;
     size_t clusterRealSize = sizeof(size_t) * 3 + tempClusterSize;
@@ -148,9 +151,7 @@ void FileManager :: remove(size_t position) const{
     }
 
     //go to the last cluster in the file
-    sourceFile.seekg(0, sourceFile.end);
-
-    size_t positionOfLastCluster = sourceFile.tellg() - clusterSizeInFS;
+    size_t positionOfLastCluster = endOfFile() - clusterSizeInFS;
     tempCluster.loadFromFile(sourceFile, positionOfLastCluster);
 
     size_t currentPosition = positionsOfClustersToRemove.dequeue();

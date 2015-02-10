@@ -15,6 +15,8 @@ class FileManager{
     size_t firstPositionInFile;
 
     PriorityQueue<size_t> emptyPositions;
+
+    size_t endOfFile() const;
 //remove me
 public:
     void replaceCluster(size_t position, size_t newPosition) const;
