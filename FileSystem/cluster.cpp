@@ -12,7 +12,7 @@ Cluster :: ~Cluster(){
 }
 
 
-void Cluster :: isValidPositionInFile(std::fstream & file, size_t position) const{
+void Cluster :: isValidPositionInFile(std::fstream & file, std::streampos position) const{
     file.seekg(0, file.end);
     size_t lastPositionInFile = file.tellg();
 
@@ -21,7 +21,7 @@ void Cluster :: isValidPositionInFile(std::fstream & file, size_t position) cons
     }
 }
 
-void Cluster :: loadFromFile(std::fstream & file, size_t position){
+void Cluster :: loadFromFile(std::fstream & file, std::streampos position){
     isValidPositionInFile(file, position);
 
     //send file pointer to position for reading
@@ -49,7 +49,7 @@ void Cluster :: loadFromFile(std::fstream & file, size_t position){
     dataFromFile = NULL;
 }
 
-size_t Cluster::writeToFile(std::fstream & file, size_t position) const{
+size_t Cluster::writeToFile(std::fstream & file, std::streampos position) const{
 
     isValidPositionInFile(file, position);
 
@@ -105,7 +105,7 @@ void Cluster :: setNext(size_t newNext){
 }
 
 
-bool Cluster :: isValidCluster(std::fstream & file, size_t position) const{
+bool Cluster :: isValidCluster(std::fstream & file, std::streampos position) const{
     isValidPositionInFile(file, position);
 
     //set pointer to rigth place
@@ -126,11 +126,11 @@ bool Cluster :: isValidCluster(std::fstream & file, size_t position) const{
     return true;
 }
 
-void Cluster :: markAsInvalid(std::fstream &file, size_t position) const{
+void Cluster :: markAsInvalid(std::fstream &file, std::streampos position) const{
     isValidPositionInFile(file, position);
 
     //skip prev and next pointer
-    file.seekg(position + 2 * sizeof(size_t));
+    file.seekg(position + (std :: streampos)(2 * sizeof(size_t)));
     int uselessVar = -1;
 
     file.write((char *) & uselessVar, sizeof(int));
@@ -144,7 +144,7 @@ bool Cluster :: isFirstInSequence() const{
     return prevClusterPosition == 0;
 }
 
-bool Cluster :: isLastInSequence(std::fstream & file, size_t position) const{
+bool Cluster :: isLastInSequence(std::fstream & file, std::streampos position) const{
     isValidPositionInFile(file, position);
 
     //skip prev pointer
@@ -157,7 +157,7 @@ bool Cluster :: isLastInSequence(std::fstream & file, size_t position) const{
     return !next;
 }
 
-bool Cluster :: isFirstInSequence(std::fstream & file, size_t position) const{
+bool Cluster :: isFirstInSequence(std::fstream & file, std::streampos position) const{
     isValidPositionInFile(file, position);
 
     file.seekg(position);

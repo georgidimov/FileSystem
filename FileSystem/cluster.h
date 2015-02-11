@@ -13,13 +13,13 @@ class Cluster{
     Value data;
     size_t dataSize;
 
-    void isValidPositionInFile(std :: fstream & file, size_t position) const;
+    void isValidPositionInFile(std :: fstream & file, std :: streampos position) const;
 public:
     Cluster(size_t clusterSize);
     ~Cluster();
 
-    void loadFromFile(std :: fstream & file, size_t position);
-    size_t writeToFile(std :: fstream & file, size_t position) const;
+    void loadFromFile(std :: fstream & file, std :: streampos position);
+    size_t writeToFile(std :: fstream & file, std :: streampos position) const;
 
     Value getData() const;
     size_t getDataSize() const;
@@ -31,13 +31,13 @@ public:
     void setPrev(size_t newPrev);
     void setNext(size_t newNext);
 
-    bool isValidCluster(std :: fstream & file, size_t position) const;
-    void markAsInvalid(std :: fstream & file, size_t position) const;
+    bool isValidCluster(std :: fstream & file, std :: streampos position) const;
+    void markAsInvalid(std :: fstream & file, std :: streampos position) const;
 
     bool isLastInSequence() const;
     bool isFirstInSequence() const;
 
-    bool isLastInSequence(std :: fstream & file, size_t position) const;
-    bool isFirstInSequence(std :: fstream & file, size_t position) const;
+    bool isLastInSequence(std :: fstream & file, std :: streampos position) const;
+    bool isFirstInSequence(std :: fstream & file, std :: streampos position) const;
 };
 
