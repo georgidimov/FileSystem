@@ -15,6 +15,6 @@ public:
     void addDirectory(Directory * dir);
 
     File * getFile(Value name);
-
+    Directory * getDirectory(Value name);
 };
 
