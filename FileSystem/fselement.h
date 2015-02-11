@@ -14,7 +14,7 @@ class FSElement{
     time_t lastModifiedTime;
 public:
     FSElement(Value newName, size_t position);
-    ~FSElement();
+    virtual ~FSElement();
 
     Value getName() const;
 
