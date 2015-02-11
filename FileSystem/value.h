@@ -25,6 +25,6 @@ public:
 
     char * getValue() const;
     int find(char delimiter, size_t pos = 0) const;
-
+    size_t length() const;
 };
 

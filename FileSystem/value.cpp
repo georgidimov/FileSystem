@@ -138,3 +138,7 @@ int Value::find(char delimiter, size_t pos) const{
 
     return -1;
 }
+
+size_t Value :: length() const{
+    return strlen(value);
+}
