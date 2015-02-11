@@ -1,5 +1,15 @@
 #include "file.h"
 
+File :: File(Value newName, size_t newSize){
+    name = newName;
+    positionInFile = 0;
+    size = newSize;
+    sizeInFileSystem = 0;
+
+    time(&creationTime);
+    time(&lastModifiedTime);
+}
+
 File :: File(Value newName, std::streampos position, size_t newSize, size_t newSizeInFS){
     name = newName;
     positionInFile = position;
