@@ -12,7 +12,8 @@ class Cluster{
 
     Value data;
     size_t dataSize;
-    bool isValidPositionInFile(std :: fstream & file, size_t position) const;
+
+    void isValidPositionInFile(std :: fstream & file, size_t position) const;
 public:
     Cluster(size_t clusterSize);
     ~Cluster();
@@ -33,6 +34,10 @@ public:
     bool isValidCluster(std :: fstream & file, size_t position) const;
     void markAsInvalid(std :: fstream & file, size_t position) const;
 
+    bool isLastInSequence() const;
+    bool isFirstInSequence() const;
+
     bool isLastInSequence(std :: fstream & file, size_t position) const;
+    bool isFirstInSequence(std :: fstream & file, size_t position) const;
 };
 

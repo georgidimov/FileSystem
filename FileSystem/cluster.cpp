@@ -11,31 +11,36 @@ Cluster :: ~Cluster(){
     ;
 }
 
-bool Cluster :: isValidPositionInFile(std::fstream & file, size_t position) const{
+
+void Cluster :: isValidPositionInFile(std::fstream & file, size_t position) const{
     file.seekg(0, file.end);
     size_t lastPositionInFile = file.tellg();
 
     if(position > lastPositionInFile){
-        return false;
+        throw std :: runtime_error("invalid position in file");
     }
-
-    return true;
 }
 
 void Cluster :: loadFromFile(std::fstream & file, size_t position){
-    if(!isValidPositionInFile(file, position)){
-        throw std :: runtime_error("invalid position in file");
-    }
+    isValidPositionInFile(file, position);
 
     //send file pointer to position for reading
     file.seekg(position);
 
     char * dataFromFile = new char[size];
 
+    int tempDataSize;
     //read data
     file.read((char *) & prevClusterPosition, sizeof(size_t));
     file.read((char *) & nextClusterPosition, sizeof(size_t));
-    file.read((char *) & dataSize, sizeof(size_t));
+    file.read((char *) & tempDataSize, sizeof(int));
+
+    if(tempDataSize != -1){  //cluster is valid
+        dataSize = tempDataSize;
+    }else {
+        dataSize = 0;
+    }
+
     file.read(dataFromFile, dataSize * sizeof(char));
 
     data = Value(dataFromFile, dataSize);
@@ -45,7 +50,13 @@ void Cluster :: loadFromFile(std::fstream & file, size_t position){
 }
 
 size_t Cluster::writeToFile(std::fstream & file, size_t position) const{
-    if(!isValidPositionInFile(file, position)){
+
+    isValidPositionInFile(file, position);
+
+    file.seekg(0, file.end);
+    size_t lastPositionInFile = file.tellg();
+
+    if(position > lastPositionInFile){
         throw std :: runtime_error("invalid position in file");
     }
 
@@ -93,10 +104,9 @@ void Cluster :: setNext(size_t newNext){
     nextClusterPosition = newNext;
 }
 
+
 bool Cluster :: isValidCluster(std::fstream & file, size_t position) const{
-    if(!isValidPositionInFile(file, position)){
-        throw std :: runtime_error("invalid position in file");
-    }
+    isValidPositionInFile(file, position);
 
     //set pointer to rigth place
     file.seekg(position);
@@ -117,9 +127,7 @@ bool Cluster :: isValidCluster(std::fstream & file, size_t position) const{
 }
 
 void Cluster :: markAsInvalid(std::fstream &file, size_t position) const{
-    if(!isValidPositionInFile(file, position)){
-        throw std :: runtime_error("invalid position in file");
-    }
+    isValidPositionInFile(file, position);
 
     //skip prev and next pointer
     file.seekg(position + 2 * sizeof(size_t));
@@ -128,10 +136,16 @@ void Cluster :: markAsInvalid(std::fstream &file, size_t position) const{
     file.write((char *) & uselessVar, sizeof(int));
 }
 
+bool Cluster :: isLastInSequence() const{
+    return !nextClusterPosition;
+}
+
+bool Cluster :: isFirstInSequence() const{
+    return prevClusterPosition == 0;
+}
+
 bool Cluster :: isLastInSequence(std::fstream & file, size_t position) const{
-    if(!isValidPositionInFile(file, position)){
-        throw std :: runtime_error("invalid position in file");
-    }
+    isValidPositionInFile(file, position);
 
     //skip prev pointer
     file.seekg(position);
@@ -141,4 +155,14 @@ bool Cluster :: isLastInSequence(std::fstream & file, size_t position) const{
     file.read((char *) & next, sizeof(size_t));
 
     return !next;
+}
+
+bool Cluster :: isFirstInSequence(std::fstream & file, size_t position) const{
+    isValidPositionInFile(file, position);
+
+    file.seekg(position);
+    size_t prev;
+    file.read((char *) & prev, sizeof(size_t));
+
+    return prev == 0 && isValidCluster(file, position);
 }
