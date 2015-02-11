@@ -6,7 +6,7 @@ class File{
 protected:
      Value name;
 
-     size_t positionInFile;
+     std :: streampos positionInFile;
 
      size_t size;
      size_t sizeInFileSystem;
@@ -14,13 +14,13 @@ protected:
      time_t creationTime;
      time_t lastModifiedTime;
 public:
-     File(Value newName, size_t position, size_t newSize, size_t newSizeInFS);
+     File(Value newName, std :: streampos position, size_t newSize, size_t newSizeInFS);
      File(Value serialized);
 
      ~File();
 
      Value getName() const;
-     size_t getPosition() const;
+     std :: streampos getPosition() const;
 
      Value getCreationTime() const;
      Value getLastModifiedTime() const;

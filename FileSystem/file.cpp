@@ -1,6 +1,6 @@
 #include "file.h"
 
-File :: File(Value newName, size_t position, size_t newSize, size_t newSizeInFS){
+File :: File(Value newName, std::streampos position, size_t newSize, size_t newSizeInFS){
     name = newName;
     positionInFile = position;
     size = newSize;
@@ -22,7 +22,7 @@ Value File :: getName() const{
     return name;
 }
 
-size_t File :: getPosition() const{
+std::streampos File::getPosition() const{
     return positionInFile;
 }
 

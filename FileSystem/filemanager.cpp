@@ -139,7 +139,7 @@ size_t FileManager :: write(const char * data, size_t size){
     return positionOfFirstCluster;
 }
 
-Value FileManager :: read(size_t position) const{
+Value FileManager :: read(std :: streampos position) const{
     isValidPositionInFile(position);
 
     //send file pointer to position for reading
@@ -184,7 +184,7 @@ void FileManager :: replaceCluster(std::streampos position, std::streampos newPo
     currentCluster.writeToFile(sourceFile, previousClusterPosition);
 }
 
-void FileManager :: remove(size_t position){
+void FileManager :: remove(std::streampos position){
     isValidPositionInFile(position);
 
 
@@ -201,7 +201,7 @@ void FileManager :: remove(size_t position){
     }
 
     //closest position to the end of the file
-    size_t maxPosition = position;
+    std :: streampos maxPosition = position;
 
     //add clusters from the sequence to the queue of "empty" clusters
     while(!tempCluster.isLastInSequence()) {

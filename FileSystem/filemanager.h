@@ -26,7 +26,7 @@ public:
     ~FileManager();
 
     size_t write(const char * data, size_t size);
-    Value read(size_t position) const;
-    void remove(size_t position);
+    Value read(std :: streampos position) const;
+    void remove(std :: streampos position);
 };
 
