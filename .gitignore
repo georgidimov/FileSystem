@@ -9,3 +9,13 @@ tests/tst_filemanager.o
 tests/value.o
 tests/cluster.o
 tests/moc_tst_filemanager.cpp
+tests/file.o
+tests/files/source_file_true
+tests/files/temp_file
+tests/moc_tst_file.cpp
+tests/moc_tst_file.o
+tests/tst_file.o
+FileSystem/source_file
+FileSystem/source_file_true
+
+
