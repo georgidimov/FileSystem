@@ -40,7 +40,7 @@ public:
 
         Iterator & operator++();
 
-        T operator *();
+        T & operator *();
 
         bool operator ==(const Iterator & r) const;
         operator bool() const;
@@ -273,8 +273,8 @@ typename List<T> :: Iterator & List<T> :: Iterator :: operator ++(){
 }
 
 template <class T>
-T List<T> :: Iterator ::operator *(){
-    return current->getValue();
+T & List<T> :: Iterator ::operator *(){
+    return const_cast<T &>(current->getValue());
 }
 
 template <class T>
