@@ -4,9 +4,8 @@
 
 class Directory : public File{
     List<File *> files;
-    List<Directory *> directories;
+    List<Directory *> directies;
 public:
     Directory(Value newName, size_t position, size_t newSize, size_t newSizeInFS);
 };
-
 
