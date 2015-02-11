@@ -13,10 +13,12 @@ HEADERS += cluster.h file.h filemanager.h value.h \
     queue.hpp \
     node.hpp \
     list.hpp \
-    priorityqueue.hpp
+    priorityqueue.hpp \
+    fselement.h
 
 SOURCES += cluster.cpp \
            file.cpp \
            filemanager.cpp \
            main.cpp \
            value.cpp \
+    fselement.cpp
