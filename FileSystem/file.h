@@ -18,11 +18,15 @@ public:
      ~File();
 
      Value getName() const;
+     size_t getPosition() const;
 
      Value getCreationTime() const;
      Value getLastModifiedTime() const;
 
      size_t getSize() const;
      size_t getSizeInFileSystem() const;
+
+     virtual Value serialize() const;
+     virtual void deserialize(Value serialized);
  };
 
