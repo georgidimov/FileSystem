@@ -19,6 +19,39 @@ Value :: Value(const char * passedValue, size_t end){
     value[end] = '\0';
 }
 
+Value :: Value(Value passedValue, size_t end){
+    value = new char[end + 1];
+    char * passedValueC = passedValue.getValue();
+    for(size_t i = 0; i < end; ++i){
+        value[i] = passedValueC[i];
+    }
+
+    value[end] = '\0';
+}
+
+Value :: Value(size_t passedValue){
+    size_t digitsCount;
+
+    //invalid values for log10
+    if(passedValue == 0 || passedValue == 1){
+        digitsCount = 1;
+    }else{
+        digitsCount = ceil(log10(passedValue));
+    }
+
+    value = new char[digitsCount + 1];
+
+    value[digitsCount] = '\0';
+
+    do{
+        --digitsCount;
+        value[digitsCount] = (char)( (passedValue % 10) + 48);
+
+        passedValue /= 10;
+    }while (passedValue > 0) ;
+
+}
+
 Value :: Value(const Value &o){
     //check for self-assignment
     if(&o == this){
@@ -72,6 +105,18 @@ Value Value :: operator +(const Value & v) const{
     return concatenatedValue;
 }
 
+size_t Value :: toNumber() const{
+    size_t result = 0;
+    size_t length = strlen(value);
+
+    for(size_t i = 0; i < length; ++i){
+        result *= 10;
+        result += (int)value[i] - 48;
+    }
+
+    return result;
+}
+
 std :: ostream & operator <<(std :: ostream & out, const Value & v){
     out << v.value;
 
@@ -80,4 +125,16 @@ std :: ostream & operator <<(std :: ostream & out, const Value & v){
 
 char * Value :: getValue() const{
     return value;
+}
+
+int Value::find(char delimiter, size_t pos) const{
+    size_t length = strlen(value);
+
+    for(; pos < length; ++pos){
+        if(value[pos] == delimiter){
+            return pos;
+        }
+    }
+
+    return -1;
 }
