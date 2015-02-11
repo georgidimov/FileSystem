@@ -76,15 +76,15 @@ Value Cluster :: getData() const{
     return data;
 }
 
-size_t Cluster :: getDataSize() const{
+std :: streampos Cluster :: getDataSize() const{
     return dataSize;
 }
 
-size_t Cluster :: getPrev() const{
+std :: streampos Cluster :: getPrev() const{
     return prevClusterPosition;
 }
 
-size_t Cluster :: getNext() const{
+std :: streampos Cluster :: getNext() const{
     return nextClusterPosition;
 }
 
@@ -96,11 +96,11 @@ void Cluster :: setDataSize(size_t newDataSize){
     dataSize = newDataSize;
 }
 
-void Cluster :: setPrev(size_t newPrev){
+void Cluster :: setPrev(std :: streampos newPrev){
     prevClusterPosition = newPrev;
 }
 
-void Cluster :: setNext(size_t newNext){
+void Cluster :: setNext(std :: streampos newNext){
     nextClusterPosition = newNext;
 }
 
@@ -126,7 +126,7 @@ bool Cluster :: isValidCluster(std::fstream & file, std::streampos position) con
     return true;
 }
 
-void Cluster :: markAsInvalid(std::fstream &file, std::streampos position) const{
+void Cluster :: markAsInvalid(std::fstream & file, std::streampos position) const{
     isValidPositionInFile(file, position);
 
     //skip prev and next pointer

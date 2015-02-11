@@ -7,8 +7,8 @@
 
 class Cluster{
     size_t size;
-    size_t prevClusterPosition;
-    size_t nextClusterPosition;
+    std :: streampos prevClusterPosition;
+    std :: streampos nextClusterPosition;
 
     Value data;
     size_t dataSize;
@@ -22,14 +22,14 @@ public:
     size_t writeToFile(std :: fstream & file, std :: streampos position) const;
 
     Value getData() const;
-    size_t getDataSize() const;
-    size_t getPrev() const;
-    size_t getNext() const;
+    std :: streampos getDataSize() const;
+    std :: streampos getPrev() const;
+    std :: streampos getNext() const;
 
     void setData(Value newData);
     void setDataSize(size_t newDataSize);
-    void setPrev(size_t newPrev);
-    void setNext(size_t newNext);
+    void setPrev(std :: streampos newPrev);
+    void setNext(std :: streampos newNext);
 
     bool isValidCluster(std :: fstream & file, std :: streampos position) const;
     void markAsInvalid(std :: fstream & file, std :: streampos position) const;
