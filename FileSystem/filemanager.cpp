@@ -17,6 +17,12 @@ FileManager :: FileManager(std :: fstream & file, size_t fileBeginning) : source
     clusterSizeInFS = 3 * sizeof(size_t) + clusterSize;
 
     firstPositionInFile = fileBeginning;
+    /*
+    emptyPositions.enqueue(52);
+    emptyPositions.enqueue(68);
+    emptyPositions.enqueue(84);
+    emptyPositions.enqueue(100);
+    emptyPositions.enqueue(116);*/
 }
 
 FileManager :: ~FileManager(){
@@ -45,18 +51,38 @@ size_t FileManager :: endOfFile() const{
     return end;
 }
 
-size_t FileManager :: write(const char * data, size_t size) const{
+size_t FileManager :: write(const char * data, size_t size){
     //define count of clusters needed for saving data
     size_t neededClusters = ceil( (double)size / clusterSize );
 
-    size_t positionOfFirstCluster = endOfFile();
+    bool clustersInSequence = true;
+    size_t positionOfFirstCluster;
+    ///FIX ME
+    if(emptyPositions.isEmpty()){
+        positionOfFirstCluster = endOfFile();
+    }else{
+        positionOfFirstCluster = emptyPositions.dequeue();
+        clustersInSequence = false;
+    }
+
+
     sourceFile.seekg(positionOfFirstCluster);
 
     size_t tempSize = size;
     size_t tempClusterSize = clusterSize;
     size_t clusterRealSize = sizeof(size_t) * 3 + tempClusterSize;
     size_t prev = 0;
-    size_t next = positionOfFirstCluster + clusterRealSize;
+    size_t next;// = positionOfFirstCluster + clusterRealSize;
+
+    if(clustersInSequence){  //clusters are in sequence
+        next = positionOfFirstCluster + clusterRealSize;
+    }else{                  //clusters are not in sequence
+        if(!emptyPositions.isEmpty()){
+            next = emptyPositions.dequeue();
+        }else{
+            next = endOfFile();
+        }
+    }
 
     Cluster tempCluster(clusterSize);
     //for every cluster write position of previous, next,
@@ -81,8 +107,29 @@ size_t FileManager :: write(const char * data, size_t size) const{
 
         tempCluster.writeToFile(sourceFile, sourceFile.tellg());
 
-        prev = next - clusterRealSize;
-        next += clusterRealSize;
+        if(clustersInSequence){
+            prev = next - clusterRealSize;
+            next += clusterRealSize;
+        }else{
+            prev = sourceFile.tellg() - clusterSizeInFS;
+
+            if(next == endOfFile()){
+                sourceFile.seekg(endOfFile());
+                next += clusterRealSize;
+                clustersInSequence = true;
+            }else{
+                sourceFile.seekg(next);
+
+                if(!emptyPositions.isEmpty()){
+                    next = emptyPositions.dequeue();
+                }else{
+                    next = endOfFile();
+                    clustersInSequence;
+                }
+            }
+        }
+
+
         tempSize -= tempClusterSize;
     }
 
@@ -137,17 +184,63 @@ void FileManager :: replaceCluster(size_t position, size_t newPosition) const{
     currentCluster.writeToFile(sourceFile, previousClusterPosition);
 }
 
-void FileManager :: remove(size_t position) const{
+void FileManager :: remove(size_t position){
     isValidPositionInFile(position);
 
 
     Cluster tempCluster(clusterSize);
     tempCluster.loadFromFile(sourceFile, position);
+    tempCluster.markAsInvalid(sourceFile, position);
 
-    if(!tempCluster.isValidCluster(sourceFile, position)){
-        throw std :: runtime_error("try to remove wrong cluster");
+    //if(!tempCluster.isValidCluster(sourceFile, position)){
+    //    throw std :: runtime_error("try to remove wrong cluster");
+    //}
+
+    if(!tempCluster.isFirstInSequence()){
+        throw std :: runtime_error("start removing from not first cluster");
     }
 
+    //closest position to the end of the file
+    size_t maxPosition = position;
+
+    //add clusters from the sequence to the queue of "empty" clusters
+    while(!tempCluster.isLastInSequence()) {
+        emptyPositions.enqueue(position);
+        position = tempCluster.getNext();
+        tempCluster.loadFromFile(sourceFile, position);
+        tempCluster.markAsInvalid(sourceFile, position);
+        maxPosition = position > maxPosition ? position : maxPosition;
+    }
+    //add also the last one
+    emptyPositions.enqueue(position);
+
+    //go to the last cluster in the file
+    size_t positionOfLastCluster = endOfFile() - clusterSizeInFS;
+    tempCluster.loadFromFile(sourceFile, positionOfLastCluster);
+    sourceFile.seekg(positionOfLastCluster);
+
+    size_t newPositionForTheCluster = emptyPositions.dequeue();
+    size_t oldPositionOfTheCluster = positionOfLastCluster;
+
+    while(oldPositionOfTheCluster > maxPosition && !emptyPositions.isEmpty()){
+
+        if(!tempCluster.isFirstInSequence()){
+            replaceCluster(oldPositionOfTheCluster, newPositionForTheCluster);
+
+//            std :: cout << oldPositionOfTheCluster << ' ' << tempCluster.getData() << std :: endl;
+
+//            std :: cout << "to postions " << newPositionForTheCluster << "\n";
+            newPositionForTheCluster = emptyPositions.dequeue();
+        }else{
+            break;
+        }
+
+        oldPositionOfTheCluster -= clusterSizeInFS;
+        tempCluster.loadFromFile(sourceFile, oldPositionOfTheCluster);
+    }
+
+    std :: cout << "limit " <<  oldPositionOfTheCluster + clusterSizeInFS << std :: endl;
+    /*
     PriorityQueue<size_t> positionsOfClustersToRemove;
     positionsOfClustersToRemove.enqueue(position);
 
@@ -160,12 +253,19 @@ void FileManager :: remove(size_t position) const{
         position = tempCluster.getNext();
 
         tempCluster.loadFromFile(sourceFile, position);
-        positionsOfClustersToRemove.enqueue(position);
+
+        if(tempCluster.isFirstInSequence()){
+            throw std :: runtime_error("invalid cluster sequence");
+        }else{
+            positionsOfClustersToRemove.enqueue(position);
+        }
 
         maxPosition = position > maxPosition ? position : maxPosition;
         minPosition = position < minPosition ? position : minPosition;
     }
+    */
 
+    /*
     //go to the last cluster in the file
     size_t positionOfLastCluster = endOfFile() - clusterSizeInFS;
     tempCluster.loadFromFile(sourceFile, positionOfLastCluster);
@@ -174,14 +274,28 @@ void FileManager :: remove(size_t position) const{
     tempCluster.loadFromFile(sourceFile, currentPosition);
 
     while(!positionsOfClustersToRemove.isEmpty() && positionOfLastCluster > maxPosition){
-        replaceCluster(positionOfLastCluster, currentPosition);
+        if(tempCluster.isFirstInSequence()){
+            emptyPositions.enqueue(currentPosition);
+        }else{
+            replaceCluster(positionOfLastCluster, currentPosition);
+        }
 
         tempCluster.loadFromFile(sourceFile, positionOfLastCluster);
         positionOfLastCluster = tempCluster.getPrev();
 
+
         currentPosition = positionsOfClustersToRemove.dequeue();
-        std :: cout << "cala";
+    }*/
+/*
+    std :: cout << "positions to remove \n";
+    while (!positionsOfClustersToRemove.isEmpty()) {
+        std :: cout << positionsOfClustersToRemove.dequeue() << std :: endl;
+    }*/
+
+    std :: cout << "empty positions: \n";
+
+    while (!emptyPositions.isEmpty()) {
+        std :: cout << emptyPositions.dequeue() << std :: endl;
+
     }
-
-
 }

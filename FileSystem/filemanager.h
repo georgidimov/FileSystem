@@ -5,7 +5,7 @@
 #include <math.h>
 #include <value.h>
 #include <cluster.h>
-#include <priorityqueue.h>
+#include <priorityqueue.hpp>
 
 class FileManager{
     std :: fstream & sourceFile;
@@ -25,8 +25,8 @@ public:
     FileManager(std :: fstream & file, size_t fileBeginning);
     ~FileManager();
 
-    size_t write(const char * data, size_t size) const;
+    size_t write(const char * data, size_t size);
     Value read(size_t position) const;
-    void remove(size_t position) const;
+    void remove(size_t position);
 };
 
