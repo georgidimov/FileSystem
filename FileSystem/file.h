@@ -15,6 +15,8 @@ protected:
      time_t lastModifiedTime;
 public:
      File(Value newName, size_t position, size_t newSize, size_t newSizeInFS);
+     File(Value serialized);
+
      ~File();
 
      Value getName() const;

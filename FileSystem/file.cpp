@@ -10,6 +10,10 @@ File :: File(Value newName, size_t position, size_t newSize, size_t newSizeInFS)
     time(&lastModifiedTime);
 }
 
+File :: File(Value serialized){
+    deserialize(serialized);
+}
+
 File :: ~File(){
     ;
 }
@@ -73,5 +77,4 @@ void File :: deserialize(Value serialized){
     Value result = name + ":" + Value(positionInFile) + ":" + Value(size)+ ":" + Value(sizeInFileSystem);
 
     result = result + ":" + Value(creationTime) + ":" + Value(lastModifiedTime);
-    std :: cout << result;
 }
