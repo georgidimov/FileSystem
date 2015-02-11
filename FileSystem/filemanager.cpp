@@ -1,6 +1,6 @@
 #include "filemanager.h"
 
-FileManager :: FileManager(std :: fstream & file, size_t fileBeginning) : sourceFile(file){
+FileManager :: FileManager(std :: fstream & file, std::streampos fileBeginning) : sourceFile(file){
     if(!sourceFile.is_open()){
         throw std :: runtime_error("wrong sourcefile path");
     }
@@ -30,7 +30,7 @@ FileManager :: ~FileManager(){
 }
 
 
-void FileManager :: isValidPositionInFile(size_t position) const{
+void FileManager :: isValidPositionInFile(std::streampos position) const{
     size_t lastPositionInFile = endOfFile();
 
     if(position > lastPositionInFile){
@@ -38,13 +38,13 @@ void FileManager :: isValidPositionInFile(size_t position) const{
     }
 }
 
-size_t FileManager :: endOfFile() const{
+std::streampos FileManager::endOfFile() const{
     //save previous position, define end of file and
     //send pointer back to previous position
-    size_t previousPosition = sourceFile.tellg();
+    std :: streampos previousPosition = sourceFile.tellg();
 
     sourceFile.seekg(0, sourceFile.end);
-    size_t end = sourceFile.tellg();
+    std :: streampos end = sourceFile.tellg();
 
     sourceFile.seekg(previousPosition);
 
@@ -71,8 +71,8 @@ size_t FileManager :: write(const char * data, size_t size){
     size_t tempSize = size;
     size_t tempClusterSize = clusterSize;
     size_t clusterRealSize = sizeof(size_t) * 3 + tempClusterSize;
-    size_t prev = 0;
-    size_t next;// = positionOfFirstCluster + clusterRealSize;
+    std :: streampos prev = 0;
+    std :: streampos next;// = positionOfFirstCluster + clusterRealSize;
 
     if(clustersInSequence){  //clusters are in sequence
         next = positionOfFirstCluster + clusterRealSize;
@@ -108,10 +108,10 @@ size_t FileManager :: write(const char * data, size_t size){
         tempCluster.writeToFile(sourceFile, sourceFile.tellg());
 
         if(clustersInSequence){
-            prev = next - clusterRealSize;
+            prev = next - (std :: streampos) clusterRealSize;
             next += clusterRealSize;
         }else{
-            prev = sourceFile.tellg() - clusterSizeInFS;
+            prev = sourceFile.tellg() - (std :: streampos) clusterSizeInFS;
 
             if(next == endOfFile()){
                 sourceFile.seekg(endOfFile());
@@ -124,7 +124,7 @@ size_t FileManager :: write(const char * data, size_t size){
                     next = emptyPositions.dequeue();
                 }else{
                     next = endOfFile();
-                    clustersInSequence;
+                    clustersInSequence = true;
                 }
             }
         }
@@ -159,7 +159,7 @@ Value FileManager :: read(size_t position) const{
     return resultData + Value("\0");
 }
 
-void FileManager :: replaceCluster(size_t position, size_t newPosition) const{
+void FileManager :: replaceCluster(std::streampos position, std::streampos newPosition) const{
     isValidPositionInFile(position);
 
     Cluster currentCluster(clusterSize);
@@ -215,7 +215,7 @@ void FileManager :: remove(size_t position){
     emptyPositions.enqueue(position);
 
     //go to the last cluster in the file
-    size_t positionOfLastCluster = endOfFile() - clusterSizeInFS;
+    size_t positionOfLastCluster = endOfFile() - (std :: streampos) clusterSizeInFS;
     tempCluster.loadFromFile(sourceFile, positionOfLastCluster);
     sourceFile.seekg(positionOfLastCluster);
 

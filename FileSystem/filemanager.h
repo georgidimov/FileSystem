@@ -14,15 +14,15 @@ class FileManager{
 
     size_t firstPositionInFile;
 
-    PriorityQueue<size_t> emptyPositions;
+    PriorityQueue<std :: streampos> emptyPositions;
 
-    size_t endOfFile() const;
+    std :: streampos endOfFile() const;
 //remove me
 public:
-    void replaceCluster(size_t position, size_t newPosition) const;
-    void isValidPositionInFile(size_t position) const;
+    void replaceCluster(std :: streampos position, std :: streampos newPosition) const;
+    void isValidPositionInFile(std :: streampos position) const;
 public:
-    FileManager(std :: fstream & file, size_t fileBeginning);
+    FileManager(std :: fstream & file, std :: streampos fileBeginning);
     ~FileManager();
 
     size_t write(const char * data, size_t size);
