@@ -43,6 +43,7 @@ size_t File :: getSizeInFileSystem() const{
 }
 
 Value File :: serialize() const{
+    //concatenate all variables
     Value result = name + ":" + Value(positionInFile) + ":" + Value(size)+ ":" + Value(sizeInFileSystem);
 
     return result + ":" + Value(creationTime) + ":" + Value(lastModifiedTime);
@@ -51,6 +52,8 @@ Value File :: serialize() const{
 void File :: deserialize(Value serialized){
     size_t delimiter = serialized.find(':');
 
+    //jump to positins of ':' in serilized string
+    //and load value for every variable
 
     name = Value(serialized.getValue(), delimiter);
     size_t i = delimiter + 1;
