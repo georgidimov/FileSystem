@@ -3,6 +3,7 @@
 #include <value.h>
 
 class File{
+protected:
      Value name;
 
      size_t positionInFile;
@@ -12,7 +13,7 @@ class File{
 
      time_t creationTime;
      time_t lastModifiedTime;
- public:
+public:
      File(Value newName, size_t position, size_t newSize, size_t newSizeInFS);
      ~File();
 
