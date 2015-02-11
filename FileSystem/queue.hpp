@@ -3,7 +3,7 @@
 #include <list.hpp>
 
 template <class T>
-class Queue : private List<T>{
+class Queue : protected List<T>{
 public:
     Queue();
     Queue(const Queue & o);
