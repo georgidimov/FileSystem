@@ -107,7 +107,6 @@ Directory * Directory :: getParent() const{
 Value Directory :: serialize() const{
     Value serialized = File :: serialize();
 
-    //serialized = serialized + ":" + Value(files.getSize()) + ":";
     serialized = serialized + ":" + Value(files.getSize());
     for(List<File *> :: Iterator it = files.begin(); it; it++){
         serialized = serialized + (*it)->serialize();
@@ -115,16 +114,17 @@ Value Directory :: serialize() const{
 
     serialized = serialized + ":" + Value(directories.getSize());
     for(List<Directory *> :: Iterator it = directories.begin(); it; it++){
-        //serialized = serialized + (*it)->serialize().length() + (*it)->serialize();
         serialized = serialized + (*it)->serialize();
     }
 
     return Value(":") + Value(serialized.length()) + serialized;
-    //return Value(":") + serialized;
 }
 
 Value Directory::deserialize(Value serialized){
+    //remove current content
     clear();
+
+    //define part of the string for this folder
     size_t length = serialized.length();
 
     size_t i = 1;
@@ -136,23 +136,27 @@ Value Directory::deserialize(Value serialized){
 
     size_t serializedStringLength = Value(serialized, 1, i).toNumber();
 
+    //split part of the string that is not needed
     Value restOfTheString = Value(serialized, serializedStringLength + i, length);
-    serialized = Value(serialized, i, serializedStringLength + i);
 
+    //load information for the current folder - name, size and etc.
+    serialized = Value(serialized, i, serializedStringLength + i);
     serialized = File :: deserialize(serialized);
 
+
+    //read part for the files in the folder
     for(i = 1; i < length; ++i){
         if(serialized[i] < '0' || serialized[i] > '9'){
             break;
         }
     }
     size_t delimiter = serialized.find(':', 1);
-
     size_t filesCount = Value(serialized, 1, i).toNumber();
+
     serialized = Value(serialized, delimiter, serialized.length());
 
     File * tempFile = NULL;
-
+    //add files in the folder
     for(i = 0; i < filesCount; ++i){
         tempFile = new File("", 0);
         serialized = tempFile->deserialize(serialized) + Value(":");
@@ -161,35 +165,31 @@ Value Directory::deserialize(Value serialized){
     }
     tempFile = NULL;
 
+
+    //read part for the subfolders
     for(i = 1; i < length; ++i){
         if(serialized[i] < '0' || serialized[i] > '9'){
             break;
         }
     }
+
     delimiter = serialized.find(':', 1);
 
     size_t directoriesCount = Value(serialized, 1, i).toNumber();
-
-
     serialized = Value(serialized, delimiter, serialized.length());
-    //std :: cout << "\n" << directoriesCount << "\n" << serialized;
 
-
-
+    //add subfolders
     Directory * tempDir = NULL;
-    //:44:36:Sub Dir:0:0:0:1423751368:1423751368:0:0:
-    //std :: cout << "\n:44:36:Sub Dir:0:0:0:1423751368:1423751368:0:0:\n";
-
     for(i = 0; i < directoriesCount; ++i){
         tempDir = new Directory("", 0, NULL);
-        serialized = tempDir->deserialize(serialized); //+ Value(":");
+        serialized = tempDir->deserialize(serialized);
         addDirectory(tempDir);
 
     }
     tempDir = NULL;
 
+    //return the part of the string that is for the other folders
     return restOfTheString;
-
 }
 
 void Directory :: printContent() const{
