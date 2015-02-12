@@ -10,6 +10,10 @@ Directory :: Directory(Value newName, size_t position, size_t newSize, size_t ne
     parent = nParent;
 }
 
+Directory :: Directory(Value serializedString) : File("", 0){
+    deserialize(serializedString);
+}
+
 Directory :: ~Directory(){
     clear();
 }
@@ -120,8 +124,6 @@ Value Directory :: serialize() const{
 }
 
 Value Directory::deserialize(Value serialized){
-
-    std :: cout << "now " << serialized << "\n";
     clear();
     size_t length = serialized.length();
 

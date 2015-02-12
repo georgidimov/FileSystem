@@ -11,7 +11,7 @@ class Directory : public File{
 public:
     Directory(Value newName, size_t size, Directory * newParent);
     Directory(Value newName, size_t position, size_t newSize, size_t newSizeInFS, Directory * nParent);
-
+    Directory(Value serializedString);
     ~Directory();
 
     void addFile(File * file);
