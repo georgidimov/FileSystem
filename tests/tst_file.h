@@ -6,5 +6,6 @@ class tst_File : public QObject{
 private slots:
     void testSerialization();
     void testDeserialization();
+    void testRestOfDeserealization();
 };
 

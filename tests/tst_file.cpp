@@ -8,17 +8,18 @@ void tst_File :: testSerialization(){
 
     File file(fileName, position, size, realSize);
 
-    //find delimiter before timestamps
+    //find delimiter before timestamps and skip them
     size_t delimiter = fileName.length() + ceil(log10(position)) + ceil(log10(size)) + ceil(log10(realSize));
     //add also ':'
-    delimiter += 4;
+    delimiter += 5;
+    delimiter += 2;
 
     QString result(Value(file.serialize(), delimiter).getValue());
-    QCOMPARE(result, QString("fil3_NAme!:2:123:1235:"));
+    QCOMPARE(result, QString(":44:fil3_NAme!:2:123:1235"));
 }
 
 void tst_File :: testDeserialization(){
-    File file(Value("File_Name:1:0:15:1423655595:1423655597"));
+    File file(Value(":38:File_Name:1:0:15:1423655595:1423655597"));
 
     Value fileName = "File_Name";
     size_t position = 1;
@@ -32,6 +33,12 @@ void tst_File :: testDeserialization(){
     QVERIFY2(file.getSize() == size, "problem with file size");
     QVERIFY2(file.getSizeInFileSystem() == realSize, "problem with file size in FS");
     QVERIFY2(file.getCreationTime() == Value( ctime(&created) ), "problem with file creation time stamp");
-    QVERIFY2(file.getLastModifiedTime() == Value( ctime(&lastModified) ), "problem with file last modified time stamp");
+    QVERIFY2(file.getLastModifiedTime() == Value( ctime(&lastModified) ), "problem with file last modified time stamp");   
+}
+    
+void tst_File :: testRestOfDeserealization(){
+    File file("justFile", 2, 1, 1);
+    Value rest = file.deserialize(":38:File_Name:1:0:15:1423655595:14236555971111");
+    QVERIFY2(rest != Value("1111"), "problem return in deserialization");
 }
 
