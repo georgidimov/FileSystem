@@ -9,10 +9,11 @@ TARGET = tests
 INCLUDEPATH += .
 
 # Input
-HEADERS += tst_filemanager.h tst_file.h ../FileSystem/filemanager.h ../FileSystem/value.h ../FileSystem/cluster.h ../FileSystem/file.h\	
+HEADERS += tst_filemanager.h tst_file.h tst_directory.h ../FileSystem/filemanager.h ../FileSystem/value.h ../FileSystem/cluster.h ../FileSystem/file.h ../FileSystem/directory.h\	
 
-SOURCES += testRunner.cpp tst_filemanager.cpp tst_file.cpp \
+SOURCES += testRunner.cpp tst_filemanager.cpp tst_file.cpp tst_directory.cpp \
 	   ../FileSystem/filemanager.cpp \
            ../FileSystem/value.cpp \
            ../FileSystem/cluster.cpp \
 	   ../FileSystem/file.cpp \
+	    ../FileSystem/directory.cpp \

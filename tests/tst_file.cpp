@@ -8,18 +8,18 @@ void tst_File :: testSerialization(){
 
     File file(fileName, position, size, realSize);
 
-    //find delimiter before timestamps and skip them
-    size_t delimiter = fileName.length() + ceil(log10(position)) + ceil(log10(size)) + ceil(log10(realSize));
-    //add also ':'
-    delimiter += 5;
-    delimiter += 2;
+    time_t t;
+    time(&t);
 
-    QString result(Value(file.serialize(), delimiter).getValue());
-    QCOMPARE(result, QString(":44:fil3_NAme!:2:123:1235"));
+    Value expectedResult = ":44:fil3_NAme!:2:123:1235:";
+    expectedResult = expectedResult + Value(t) + ":" + Value(t);
+
+    QString result(file.serialize().getValue());
+    QCOMPARE(result, QString(expectedResult.getValue()));
 }
 
 void tst_File :: testDeserialization(){
-    File file(Value(":38:File_Name:1:0:15:1423655595:1423655597"));
+    File file(Value(":39:File_Name:1:0:15:1423655595:1423655597"));
 
     Value fileName = "File_Name";
     size_t position = 1;
@@ -38,7 +38,7 @@ void tst_File :: testDeserialization(){
     
 void tst_File :: testRestOfDeserealization(){
     File file("justFile", 2, 1, 1);
-    Value rest = file.deserialize(":38:File_Name:1:0:15:1423655595:14236555971111");
-    QVERIFY2(rest != Value("1111"), "problem return in deserialization");
+    Value rest = file.deserialize(":39:File_Name:1:0:15:1423655595:14236555971111");
+    QVERIFY2(rest == Value("1111"), "problem return in deserialization");
 }
 
