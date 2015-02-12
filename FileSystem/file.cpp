@@ -109,7 +109,7 @@ Value File :: deserialize(Value serialized){
     i = delimiter + 1;
     delimiter = serialized.find(':', delimiter + 1);
 
-    lastModifiedTime = Value(serialized.getValue() + i, serializedStringLength - i + 1).toNumber();
+    lastModifiedTime = Value(serialized.getValue() + i, serializedStringLength - i - 1).toNumber();
     return restOfTheString;
 }
 

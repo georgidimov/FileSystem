@@ -117,7 +117,7 @@ Value Directory :: serialize() const{
         serialized = serialized + (*it)->serialize();
     }
 
-    return Value(":") + Value(serialized.length()) + serialized;
+    return Value(":") + Value(serialized.length() + 1) + serialized;
 }
 
 Value Directory::deserialize(Value serialized){
@@ -186,6 +186,7 @@ Value Directory::deserialize(Value serialized){
         addDirectory(tempDir);
 
     }
+
     tempDir = NULL;
 
     //return the part of the string that is for the other folders
