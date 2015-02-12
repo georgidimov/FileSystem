@@ -79,8 +79,10 @@ Value File :: deserialize(Value serialized){
     size_t serializedStringLength = Value(serialized, 1, i).toNumber();
     Value restOfTheString = Value(serialized, serializedStringLength + i, length);
 
-    serialized = Value(serialized, i + 1, length);
+    serialized = Value(serialized, i + 1, serializedStringLength + i + 1);
+
     size_t delimiter = serialized.find(':');
+
 
     //jump to positins of ':' in serilized string
     //and load value for every variable
@@ -94,10 +96,12 @@ Value File :: deserialize(Value serialized){
     delimiter = serialized.find(':', delimiter + 1);
 
     size = Value(serialized.getValue() + i, delimiter - i).toNumber();
+
     i = delimiter + 1;
     delimiter = serialized.find(':', delimiter + 1);
 
     sizeInFileSystem = Value(serialized.getValue() + i, delimiter - i).toNumber();
+
     i = delimiter + 1;
     delimiter = serialized.find(':', delimiter + 1);
 
@@ -105,8 +109,7 @@ Value File :: deserialize(Value serialized){
     i = delimiter + 1;
     delimiter = serialized.find(':', delimiter + 1);
 
-    lastModifiedTime = Value(serialized.getValue() + i, delimiter - i).toNumber();
-
+    lastModifiedTime = Value(serialized.getValue() + i, serializedStringLength - i + 1).toNumber();
     return restOfTheString;
 }
 
