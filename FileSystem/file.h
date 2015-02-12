@@ -20,7 +20,9 @@ public:
 
      virtual ~File();
 
+     void setName(Value newName);
      Value getName() const;
+
      std :: streampos getPosition() const;
 
      Value getCreationTime() const;
@@ -30,6 +32,8 @@ public:
      size_t getSizeInFileSystem() const;
 
      virtual Value serialize() const;
-     virtual void deserialize(Value serialized);
+     virtual Value deserialize(Value serialized);
+
+     void printContent() const;
  };
 

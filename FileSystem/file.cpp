@@ -28,6 +28,10 @@ File :: ~File(){
     ;
 }
 
+void File :: setName(Value newName){
+    name = newName;
+}
+
 Value File :: getName() const{
     return name;
 }
@@ -56,17 +60,33 @@ Value File :: serialize() const{
     //concatenate all variables
     Value result = name + ":" + Value(positionInFile) + ":" + Value(size)+ ":" + Value(sizeInFileSystem);
 
-    return result + ":" + Value(creationTime) + ":" + Value(lastModifiedTime);
+    result = result + ":" + Value(creationTime) + ":" + Value(lastModifiedTime);
+
+    return Value(":") + Value(result.length() + 1) + ":" + result;
 }
 
-void File :: deserialize(Value serialized){
+Value File :: deserialize(Value serialized){
+    size_t length = serialized.length();
+
+    //skip ':'
+    size_t i = 1;
+    for(; i < length; ++i){
+        if(serialized[i] < '0' || serialized[i] > '9'){
+            break;
+        }
+    }
+    //skip ':'
+    size_t serializedStringLength = Value(serialized, 1, i).toNumber();
+    Value restOfTheString = Value(serialized, serializedStringLength + i, length);
+
+    serialized = Value(serialized, i + 1, length);
     size_t delimiter = serialized.find(':');
 
     //jump to positins of ':' in serilized string
     //and load value for every variable
 
     name = Value(serialized.getValue(), delimiter);
-    size_t i = delimiter + 1;
+    i = delimiter + 1;
     delimiter = serialized.find(':', delimiter + 1);
 
     positionInFile = Value(serialized.getValue() + i, delimiter - i).toNumber();
@@ -85,9 +105,15 @@ void File :: deserialize(Value serialized){
     i = delimiter + 1;
     delimiter = serialized.find(':', delimiter + 1);
 
-    lastModifiedTime = Value(serialized.getValue() + i).toNumber();
+    lastModifiedTime = Value(serialized.getValue() + i, delimiter - i).toNumber();
 
-    Value result = name + ":" + Value(positionInFile) + ":" + Value(size)+ ":" + Value(sizeInFileSystem);
+    return restOfTheString;
+}
 
-    result = result + ":" + Value(creationTime) + ":" + Value(lastModifiedTime);
+void File :: printContent() const{
+    std :: cout << "name:          " << name << "\n"
+                << "size:          " << size << "\n"
+                << "real size:     " << sizeInFileSystem << "\n"
+                << "created:       " << getCreationTime()
+                << "last modified: " << getLastModifiedTime();
 }
