@@ -23,6 +23,7 @@ public:
     void addAt(int index, T newElement);
 
     T removeAt(int index);
+
     const T & getAt(int index) const;
 
 
@@ -152,7 +153,7 @@ void List<T> :: addAt(int index, T newElement){
 }
 
 template <class T>
-T List<T> :: removeAt(int index){
+T List<T>::removeAt(int index){
     if(index < 0 || index > size){
         throw "invalid index";
     }
