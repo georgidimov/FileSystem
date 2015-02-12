@@ -17,5 +17,9 @@ tests/moc_tst_file.o
 tests/tst_file.o
 FileSystem/source_file
 FileSystem/source_file_true
+tests/directory.o
+tests/moc_tst_directory.cpp
+tests/moc_tst_directory.o
+tests/tst_directory.o
 
 
