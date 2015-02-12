@@ -29,6 +29,18 @@ Value :: Value(Value passedValue, size_t end){
     value[end] = '\0';
 }
 
+Value :: Value(Value passedValue, size_t start, size_t end){
+    value = new char[end + 1 - start];
+
+    char * passedValueC = passedValue.getValue();
+
+    for(size_t i = 0; i < end - start; ++i){
+            value[i] = passedValueC[start + i];
+    }
+
+    value[end - start] = '\0';
+}
+
 Value :: Value(size_t passedValue){
     size_t digitsCount;
 
@@ -103,6 +115,10 @@ Value Value :: operator +(const Value & v) const{
     delete [] newValue;
 
     return concatenatedValue;
+}
+
+char Value :: operator [](size_t position){
+    return value[position];
 }
 
 size_t Value :: toNumber() const{
