@@ -240,57 +240,6 @@ void FileManager :: remove(std::streampos position){
     }
 
     std :: cout << "limit " <<  oldPositionOfTheCluster + clusterSizeInFS << std :: endl;
-    /*
-    PriorityQueue<size_t> positionsOfClustersToRemove;
-    positionsOfClustersToRemove.enqueue(position);
-
-    //closest position to the end of the file
-    size_t maxPosition = position;
-    //closest position to the beginning of the file
-    size_t minPosition = position;
-
-    while (tempCluster.getNext() != 0) {
-        position = tempCluster.getNext();
-
-        tempCluster.loadFromFile(sourceFile, position);
-
-        if(tempCluster.isFirstInSequence()){
-            throw std :: runtime_error("invalid cluster sequence");
-        }else{
-            positionsOfClustersToRemove.enqueue(position);
-        }
-
-        maxPosition = position > maxPosition ? position : maxPosition;
-        minPosition = position < minPosition ? position : minPosition;
-    }
-    */
-
-    /*
-    //go to the last cluster in the file
-    size_t positionOfLastCluster = endOfFile() - clusterSizeInFS;
-    tempCluster.loadFromFile(sourceFile, positionOfLastCluster);
-
-    size_t currentPosition = positionsOfClustersToRemove.dequeue();
-    tempCluster.loadFromFile(sourceFile, currentPosition);
-
-    while(!positionsOfClustersToRemove.isEmpty() && positionOfLastCluster > maxPosition){
-        if(tempCluster.isFirstInSequence()){
-            emptyPositions.enqueue(currentPosition);
-        }else{
-            replaceCluster(positionOfLastCluster, currentPosition);
-        }
-
-        tempCluster.loadFromFile(sourceFile, positionOfLastCluster);
-        positionOfLastCluster = tempCluster.getPrev();
-
-
-        currentPosition = positionsOfClustersToRemove.dequeue();
-    }*/
-/*
-    std :: cout << "positions to remove \n";
-    while (!positionsOfClustersToRemove.isEmpty()) {
-        std :: cout << positionsOfClustersToRemove.dequeue() << std :: endl;
-    }*/
 
     std :: cout << "empty positions: \n";
 
