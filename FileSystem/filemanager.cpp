@@ -17,17 +17,80 @@ FileManager :: FileManager(std :: fstream & file, std::streampos fileBeginning) 
     clusterSizeInFS = 3 * sizeof(size_t) + clusterSize;
 
     firstPositionInFile = fileBeginning;
-    /*
-    emptyPositions.enqueue(52);
-    emptyPositions.enqueue(68);
-    emptyPositions.enqueue(84);
-    emptyPositions.enqueue(100);
-    emptyPositions.enqueue(116);*/
+/*
+    emptyPositions.addAt(0, 52);
+    emptyPositions.addAt(0, 68);
+    emptyPositions.addAt(0, 84);
+    emptyPositions.addAt(0, 101);
+//    emptyPositions.addAt(0, 116);*/
 }
 
 FileManager :: ~FileManager(){
     ;
 }
+
+void FileManager :: serialize(){
+    List<size_t> emptyPositions;
+    emptyPositions.addAt(0, 52);
+    emptyPositions.addAt(0, 68);
+    emptyPositions.addAt(0, 84);
+    emptyPositions.addAt(0, 101);
+    emptyPositions.addAt(0, 116);
+    Value serialized = "";
+    serialized = Value(clusterSize) + ":" + Value(clusterSizeInFS) + ":" + Value(firstPositionInFile) + ":";
+    serialized = serialized + Value(emptyPositions.getSize());
+
+    for(List<size_t> :: Iterator it = emptyPositions.begin(); it; ++it){
+        serialized = serialized + Value(":") + *it;
+    }
+
+    serialized = serialized + ":";
+
+    size_t positionOfSerializedString = write(serialized.getValue(), serialized.length());
+    sourceFile.seekg(endOfFile());
+    sourceFile.write((char *) &positionOfSerializedString, sizeof(size_t));
+}
+
+void FileManager :: deserialize(){
+    //4:16:2:5:116:101:84:68:52:26
+    sourceFile.seekg(endOfFile() - sizeof(size_t));
+    size_t positionOfSerializedString;
+    //read how long is serialized string
+    sourceFile.read((char *) &positionOfSerializedString, sizeof(size_t));
+    std :: cout << positionOfSerializedString << ' ';
+
+    Value serialized = read(positionOfSerializedString);
+
+    size_t i;
+    size_t delimiter = serialized.find(':', 1);
+    clusterSize = Value(serialized, delimiter).toNumber();
+
+    i = delimiter + 1;
+    delimiter = serialized.find(':', i);
+    clusterSizeInFS = Value(serialized, i, delimiter).toNumber();
+
+    i = delimiter + 1;
+    delimiter = serialized.find(':', i);
+    firstPositionInFile = Value(serialized, i, delimiter).toNumber();
+
+    i = delimiter + 1;
+    delimiter = serialized.find(':', i);
+    size_t positionsCount = Value(serialized, i, delimiter).toNumber();
+    std :: cout << "\n" << clusterSize << ' ' << clusterSizeInFS << ' ' << firstPositionInFile << ' ' <<positionsCount;
+    size_t position;
+    for(size_t j = 0; j < positionsCount; ++j){
+        i = delimiter + 1;
+        delimiter = serialized.find(':', i);
+        position = Value(serialized, i, delimiter).toNumber();
+
+        emptyPositions.addAt(0, position);
+    }
+    std :: cout << "\n";
+    for(size_t i = 0; i < emptyPositions.getSize(); ++i){
+        std :: cout << emptyPositions[i] << ' ';
+    }
+}
+
 
 
 void FileManager :: isValidPositionInFile(std::streampos position) const{
@@ -61,7 +124,7 @@ size_t FileManager :: write(const char * data, size_t size){
     if(emptyPositions.isEmpty()){
         positionOfFirstCluster = endOfFile();
     }else{
-        positionOfFirstCluster = emptyPositions.dequeue();
+        positionOfFirstCluster = emptyPositions.getAt(0);
         clustersInSequence = false;
     }
 
@@ -78,7 +141,7 @@ size_t FileManager :: write(const char * data, size_t size){
         next = positionOfFirstCluster + clusterRealSize;
     }else{                  //clusters are not in sequence
         if(!emptyPositions.isEmpty()){
-            next = emptyPositions.dequeue();
+            next = emptyPositions.getAt(0);
         }else{
             next = endOfFile();
         }
@@ -121,7 +184,7 @@ size_t FileManager :: write(const char * data, size_t size){
                 sourceFile.seekg(next);
 
                 if(!emptyPositions.isEmpty()){
-                    next = emptyPositions.dequeue();
+                    next = emptyPositions.getAt(0);
                 }else{
                     next = endOfFile();
                     clustersInSequence = true;
@@ -205,21 +268,22 @@ void FileManager :: remove(std::streampos position){
 
     //add clusters from the sequence to the queue of "empty" clusters
     while(!tempCluster.isLastInSequence()) {
-        emptyPositions.enqueue(position);
+        emptyPositions.addAt(0, position);
         position = tempCluster.getNext();
         tempCluster.loadFromFile(sourceFile, position);
         tempCluster.markAsInvalid(sourceFile, position);
         maxPosition = position > maxPosition ? position : maxPosition;
     }
+
     //add also the last one
-    emptyPositions.enqueue(position);
+    emptyPositions.addAt(0, position);
 
     //go to the last cluster in the file
     size_t positionOfLastCluster = endOfFile() - (std :: streampos) clusterSizeInFS;
     tempCluster.loadFromFile(sourceFile, positionOfLastCluster);
     sourceFile.seekg(positionOfLastCluster);
 
-    size_t newPositionForTheCluster = emptyPositions.dequeue();
+    size_t newPositionForTheCluster = emptyPositions.getAt(0);
     size_t oldPositionOfTheCluster = positionOfLastCluster;
 
     while(oldPositionOfTheCluster > maxPosition && !emptyPositions.isEmpty()){
@@ -230,7 +294,7 @@ void FileManager :: remove(std::streampos position){
 //            std :: cout << oldPositionOfTheCluster << ' ' << tempCluster.getData() << std :: endl;
 
 //            std :: cout << "to postions " << newPositionForTheCluster << "\n";
-            newPositionForTheCluster = emptyPositions.dequeue();
+            newPositionForTheCluster = emptyPositions.getAt(0);
         }else{
             break;
         }
@@ -244,7 +308,7 @@ void FileManager :: remove(std::streampos position){
     std :: cout << "empty positions: \n";
 
     while (!emptyPositions.isEmpty()) {
-        std :: cout << emptyPositions.dequeue() << std :: endl;
+        std :: cout << emptyPositions.getAt(0) << std :: endl;
 
     }
 }

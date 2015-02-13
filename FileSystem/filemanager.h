@@ -14,13 +14,17 @@ class FileManager{
 
     size_t firstPositionInFile;
 
-    PriorityQueue<std :: streampos> emptyPositions;
+    List<size_t> emptyPositions;
 
     std :: streampos endOfFile() const;
+
+
 //remove me
 public:
     void replaceCluster(std :: streampos position, std :: streampos newPosition) const;
     void isValidPositionInFile(std :: streampos position) const;
+    void serialize();
+    void deserialize();
 public:
     FileManager(std :: fstream & file, std :: streampos fileBeginning);
     ~FileManager();
