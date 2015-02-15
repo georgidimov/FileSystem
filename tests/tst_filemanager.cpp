@@ -3,7 +3,7 @@
 void tst_FileManager :: testReading(){
     std :: fstream sourceFile("files/source_file",
                               std :: ios :: in | std :: ios :: out | std :: ios :: binary);
-    FileManager f(sourceFile, sourceFile.end);
+    FileManager f(sourceFile);
 
     //check reading from first position
     QString result(f.read(4).getValue());
@@ -18,7 +18,7 @@ void tst_FileManager :: testReading(){
 void tst_FileManager :: testWriting(){
     std :: fstream sourceFile("files/temp_file",
                               std :: ios :: in | std :: ios :: out | std :: ios :: binary);
-    FileManager f(sourceFile, sourceFile.end);
+    FileManager f(sourceFile);
 
     //check with random text and length
     size_t pos = f.write("test writing in file", 20);
