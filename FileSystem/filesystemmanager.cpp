@@ -56,6 +56,24 @@ void FileSystemManager :: removeFile(Value path, Value name){
     fstree.removeFile(path, name);
 }
 
+void FileSystemManager :: renameFile(Value path, Value name, Value newName){
+    fstree.renameFile(path, name, newName);
+}
+
+void FileSystemManager :: moveFile(Value path, Value name, Value newPath){
+    fstree.moveFile(path, name, newPath);
+}
+
+void FileSystemManager :: copyFile(Value path, Value name, Value newPath){
+    fstree.copyFile(path, name, newPath);
+    size_t filePosition = fstree.getFilePosition(newPath, name);
+    Value fileContent = fileManager.read(filePosition);
+
+    filePosition = fileManager.write(fileContent.getValue(), fileContent.length());
+    fstree.setFilePosition(newPath, name, filePosition);
+}
+
 void FileSystemManager :: printFileInfo(Value path, Value name) const{
     fstree.printFileInfo(path, name);
 }
+

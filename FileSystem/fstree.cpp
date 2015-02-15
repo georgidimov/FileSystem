@@ -74,6 +74,7 @@ void FSTree :: moveDirectory(Value path, Value name, Value newPath){
     Directory * parent = getDirectory(path);
     Directory * directory = parent->detachDirectory(name);
 
+    directory->setParent(parent);
     parent = getDirectory(newPath);
     parent->addDirectory(directory);
 }
@@ -106,6 +107,40 @@ void FSTree :: createFile(Value path, Value name, size_t position){
 
 void FSTree :: removeFile(Value path, Value name){
     getDirectory(path)->deleteFile(name);
+}
+
+void FSTree :: renameFile(Value path, Value name, Value newName){
+    Directory * parent = getDirectory(path);
+    File * file = parent->getFile(name);
+    file->setName(newName);
+}
+
+void FSTree :: moveFile(Value path, Value name, Value newPath){
+    Directory * parent = getDirectory(path);
+    File * file = parent->detachFile(name);
+
+    parent = getDirectory(newPath);
+    parent->addFile(file);
+}
+
+void FSTree :: copyFile(Value path, Value name, Value newPath){
+    Directory * parent = getDirectory(path);
+    File * newFile = parent->getFile(name)->getCopy();
+
+    parent = getDirectory(newPath);
+    parent->addFile(newFile);
+}
+
+size_t FSTree :: getFilePosition(Value path, Value name) const{
+    Directory * parent = getDirectory(path);
+    File * file = parent->getFile(name);
+    return file->getPosition();
+}
+
+void FSTree :: setFilePosition(Value path, Value name, size_t position){
+    Directory * parent = getDirectory(path);
+    File * file = parent->getFile(name);
+    file->setPosition(position);
 }
 
 void FSTree :: printFileInfo(Value path, Value name) const{

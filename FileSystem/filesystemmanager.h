@@ -18,6 +18,9 @@ public:
 
     void createFile(Value path, Value name);
     void removeFile(Value path, Value name);
+    void renameFile(Value path, Value name, Value newName);
+    void moveFile(Value path, Value name, Value newPath);
+    void copyFile(Value path, Value name, Value newPath);
     void printFileInfo(Value path, Value name) const;
 
 };

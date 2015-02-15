@@ -23,6 +23,11 @@ public:
 
     void createFile(Value path, Value name, size_t position);
     void removeFile(Value path, Value name);
+    void renameFile(Value path, Value name, Value newName);
+    void moveFile(Value path, Value name, Value newPath);
+    void copyFile(Value path, Value name, Value newPath);
+    size_t getFilePosition(Value path, Value name) const;
+    void setFilePosition(Value path, Value name, size_t position);
     void printFileInfo(Value path, Value name) const;
     Value getSerializedFile(Value path, Value name) const;
 
