@@ -1,4 +1,5 @@
 #pragma once
+#include <stdexcept>
 #include <list.hpp>
 #include <file.h>
 
@@ -23,8 +24,12 @@ public:
     void deleteFile(Value name);
     void deleteDirectory(Value name);
 
+    Directory * detachDirectory(Value name);
+
     void setParent(Directory * newParent);
     Directory * getParent() const;
+
+    Directory * getCopy() const;
 
     virtual Value serialize() const;
     virtual Value deserialize(Value serialized);

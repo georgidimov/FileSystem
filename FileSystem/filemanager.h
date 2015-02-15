@@ -12,9 +12,8 @@ class FileManager{
     size_t clusterSize;
     size_t clusterSizeInFS;
 
-    size_t firstPositionInFile;
+    size_t treePosition;
 
-    //List<size_t> emptyPositions;
     PriorityQueue<size_t> emptyPositions;
 
     std :: streampos endOfFile() const;
@@ -27,11 +26,14 @@ public:
     void serialize();
     void deserialize();
 public:
-    FileManager(std :: fstream & file, std :: streampos fileBeginning);
+    FileManager(std :: fstream & file);
     ~FileManager();
 
     size_t write(const char * data, size_t size);
+    size_t writeTree(const char * data, size_t size);
     Value read(std :: streampos position) const;
     void remove(std :: streampos position);
+    size_t getEmptyPosition() const;
+    size_t getTreePosition() const;
 };
 

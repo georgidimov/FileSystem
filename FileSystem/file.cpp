@@ -10,9 +10,9 @@ File :: File(Value newName, size_t newSize){
     time(&lastModifiedTime);
 }
 
-File :: File(Value newName, std::streampos position, size_t newSize, size_t newSizeInFS){
+File :: File(Value newName, size_t newPosition, size_t newSize, size_t newSizeInFS){
     name = newName;
-    positionInFile = position;
+    positionInFile = newPosition;
     size = newSize;
     sizeInFileSystem = newSizeInFS;
 
@@ -36,10 +36,6 @@ Value File :: getName() const{
     return name;
 }
 
-std::streampos File::getPosition() const{
-    return positionInFile;
-}
-
 Value File :: getCreationTime() const{
     return Value( ctime(&creationTime) );
 }
@@ -48,12 +44,44 @@ Value File :: getLastModifiedTime() const{
     return Value( ctime(&lastModifiedTime) );
 }
 
+void File :: setCreationTime(time_t newCreationTime){
+    creationTime = newCreationTime;
+}
+
+void File :: setLastModifiedTime(time_t newLastModified){
+    lastModifiedTime = newLastModified;
+}
+
 size_t File :: getSize() const{
     return size;
 }
 
+void File :: setSize(size_t newSize){
+    size = newSize;
+}
+
 size_t File :: getSizeInFileSystem() const{
     return sizeInFileSystem;
+}
+
+void File :: setSizeInFS(size_t newSize){
+    sizeInFileSystem = newSize;
+}
+
+File * File :: getCopy() const{
+    File * newFile = new File(name, positionInFile, size, sizeInFileSystem);
+    newFile->setCreationTime(creationTime);
+    newFile->setLastModifiedTime(lastModifiedTime);
+
+    return newFile;
+}
+
+size_t File :: getPosition() const{
+    return positionInFile;
+}
+
+void File :: setPosition(size_t newPosition){
+    positionInFile = newPosition;
 }
 
 Value File :: serialize() const{
@@ -63,6 +91,7 @@ Value File :: serialize() const{
     result = result + ":" + Value(creationTime) + ":" + Value(lastModifiedTime);
 
     return Value(":") + Value(result.length() + 1) + ":" + result;
+    //return Value(":") + Value(result.length()) + ":" + result;
 }
 
 Value File :: deserialize(Value serialized){
@@ -114,6 +143,7 @@ Value File :: deserialize(Value serialized){
 }
 
 void File :: printContent() const{
+    std :: cout << "\n";
     std :: cout << "name:          " << name << "\n"
                 << "size:          " << size << "\n"
                 << "real size:     " << sizeInFileSystem << "\n"

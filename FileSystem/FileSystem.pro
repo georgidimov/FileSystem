@@ -16,7 +16,8 @@ HEADERS += cluster.h file.h filemanager.h value.h \
     priorityqueue.hpp \
     file.h \
     directory.h \
-    fstree.h
+    fstree.h \
+    filesystemmanager.h
 
 SOURCES += cluster.cpp \
            file.cpp \
@@ -24,4 +25,5 @@ SOURCES += cluster.cpp \
            main.cpp \
            value.cpp \
     directory.cpp \
-    fstree.cpp
+    fstree.cpp \
+    filesystemmanager.cpp

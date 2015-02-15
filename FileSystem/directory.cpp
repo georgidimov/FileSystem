@@ -68,7 +68,7 @@ Directory * Directory :: getDirectory(Value name){
         }
     }
 
-    return *it;
+    throw std :: runtime_error("invalid directory name or path");
 }
 
 void Directory :: deleteFile(Value name){
@@ -91,9 +91,23 @@ void Directory :: deleteDirectory(Value name){
         if(directories.getAt(i)->getName() == name){
             delete directories[i];
             directories.removeAt(i);
+
             return;
         }
     }
+}
+
+Directory * Directory :: detachDirectory(Value name){
+    size_t size = directories.getSize();
+
+    for(size_t i = 0; i < size; ++i){
+        if(directories.getAt(i)->getName() == name){
+            return directories.removeAt(i);
+
+        }
+    }
+
+    throw std :: runtime_error("wrong directory name or path");
 }
 
 void Directory :: setParent(Directory * newParent){
@@ -102,6 +116,28 @@ void Directory :: setParent(Directory * newParent){
 
 Directory * Directory :: getParent() const{
     return parent;
+}
+
+Directory * Directory :: getCopy() const{
+    Directory * newDirectory = new Directory(name, positionInFile, size, sizeInFileSystem, NULL);
+
+    newDirectory->setCreationTime(creationTime);
+    newDirectory->setLastModifiedTime(lastModifiedTime);
+
+    Directory * tempChild = NULL;
+    for(List<Directory *> :: Iterator it = directories.begin(); it; it++){
+        tempChild = (*it)->getCopy();
+        tempChild->setParent(newDirectory);
+        newDirectory->addDirectory(tempChild);
+    }
+
+    File * tempFile = NULL;
+    for(List<File *> :: Iterator it = files.begin(); it; it++){
+        tempFile = (*it)->getCopy();
+        newDirectory->addFile(tempFile);
+    }
+
+    return newDirectory;
 }
 
 Value Directory :: serialize() const{
@@ -117,7 +153,8 @@ Value Directory :: serialize() const{
         serialized = serialized + (*it)->serialize();
     }
 
-    return Value(":") + Value(serialized.length() + 1) + serialized;
+    //return Value(":") + Value(serialized.length() + 1) + serialized;
+    return Value(":") + Value(serialized.length()) + serialized;
 }
 
 Value Directory::deserialize(Value serialized){
@@ -177,7 +214,7 @@ Value Directory::deserialize(Value serialized){
 
     size_t directoriesCount = Value(serialized, 1, i).toNumber();
     serialized = Value(serialized, delimiter, serialized.length());
-
+    //std :: cout <<"\n\n s"<< serialized << "d " << delimiter << "l " << serialized.length() << "\n";
     //add subfolders
     Directory * tempDir = NULL;
     for(i = 0; i < directoriesCount; ++i){
@@ -205,5 +242,4 @@ void Directory :: printContent() const{
     for(List<Directory *> :: Iterator it = directories.begin(); it; it++){
         std :: cout << (*it)->getName() << "\n";
     }
-
 }

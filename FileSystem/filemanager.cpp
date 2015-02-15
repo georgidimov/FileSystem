@@ -1,6 +1,6 @@
 #include "filemanager.h"
 
-FileManager :: FileManager(std :: fstream & file, std::streampos fileBeginning) : sourceFile(file){
+FileManager :: FileManager(std :: fstream & file) : sourceFile(file){
     if(!sourceFile.is_open()){
         throw std :: runtime_error("wrong sourcefile path");
     }
@@ -12,8 +12,13 @@ FileManager :: FileManager(std :: fstream & file, std::streampos fileBeginning) 
         sourceFile.write((char *) & nil, sizeof(size_t));
     }
     clusterSize = 8;
+    clusterSizeInFS = 3 * sizeof(size_t) + clusterSize;
+    treePosition = 0;
+
     //load configuration from the file
-    deserialize();
+    if(endOfFile()){
+        deserialize();
+    }
 }
 
 FileManager :: ~FileManager(){
@@ -22,11 +27,11 @@ FileManager :: ~FileManager(){
 
 void FileManager :: serialize(){
     Value serialized = "";
-    serialized = Value(clusterSize) + ":" + Value(clusterSizeInFS) + ":" + Value(firstPositionInFile) + ":";
+    serialized = Value(clusterSize) + ":" + Value(clusterSizeInFS) + ":" + Value(treePosition) + ":";
     serialized = serialized + Value(emptyPositions.getSize());
 
     for(List<size_t> :: Iterator it = emptyPositions.begin(); it; ++it){
-        serialized = serialized + Value(":") + *it;
+        serialized = serialized + Value(":") + *it;       
     }
 
     serialized = serialized + ":";
@@ -56,7 +61,7 @@ void FileManager :: deserialize(){
 
     i = delimiter + 1;
     delimiter = serialized.find(':', i);
-    firstPositionInFile = Value(serialized, i, delimiter).toNumber();
+    treePosition = Value(serialized, i, delimiter).toNumber();
 
     i = delimiter + 1;
     delimiter = serialized.find(':', i);
@@ -80,7 +85,7 @@ void FileManager :: deserialize(){
 
         temp.loadFromFile(sourceFile, positionOfSerializedString);
         positionOfSerializedString = temp.getNext();
-    }while(positionOfSerializedString);
+    }while(positionOfSerializedString);      
 }
 
 
@@ -112,11 +117,10 @@ size_t FileManager :: write(const char * data, size_t size){
 
     bool clustersInSequence = true;
     size_t positionOfFirstCluster;
-    ///FIX ME
+
     if(emptyPositions.isEmpty()){
         positionOfFirstCluster = endOfFile();
     }else{
-        //positionOfFirstCluster = emptyPositions.getAt(0);
         positionOfFirstCluster = emptyPositions.dequeue();
         clustersInSequence = false;
     }
@@ -196,6 +200,12 @@ size_t FileManager :: write(const char * data, size_t size){
     return positionOfFirstCluster;
 }
 
+size_t FileManager :: writeTree(const char * data, size_t size){
+    size_t position = write(data, size);
+    treePosition  = position;
+    return position;
+}
+
 Value FileManager :: read(std :: streampos position) const{
     isValidPositionInFile(position);
 
@@ -260,4 +270,16 @@ void FileManager :: remove(std::streampos position){
 
     //add also the last one
     emptyPositions.enqueue(position);
+}
+
+size_t FileManager :: getEmptyPosition() const{
+    if(!emptyPositions.isEmpty()){
+        return emptyPositions.peek();
+    }else{
+        return endOfFile();
+    }
+}
+
+size_t FileManager :: getTreePosition() const{
+    return treePosition;
 }
