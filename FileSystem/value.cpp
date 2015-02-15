@@ -166,7 +166,7 @@ char * Value :: getValue() const{
     return value;
 }
 
-int Value::find(char delimiter, size_t pos) const{
+int Value :: find(char delimiter, size_t pos) const{
     size_t length = strlen(value);
 
     for(; pos < length; ++pos){
@@ -175,7 +175,7 @@ int Value::find(char delimiter, size_t pos) const{
         }
     }
 
-    return -1;
+    return 0;
 }
 
 size_t Value :: length() const{
