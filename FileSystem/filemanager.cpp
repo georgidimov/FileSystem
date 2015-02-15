@@ -8,40 +8,12 @@ FileManager :: FileManager(std :: fstream & file, std::streampos fileBeginning) 
     //make zero position unvailable - prevent writing over "system information"
     if(endOfFile() == 0){
         size_t nil = 0;
-///REMOVE MEE!
-        std :: cout << "call";
         sourceFile.seekg(0);
         sourceFile.write((char *) & nil, sizeof(size_t));
     }
     clusterSize = 8;
-    ///Fix me - add positions as empty
     //load configuration from the file
     deserialize();
-    std :: cout << "\n";
-    for(List<size_t> :: Iterator it = emptyPositions.begin(); it; ++it){
-        std :: cout << (*it) << ' ';
-    }
-
-    //for(size_t j = 0; j < emptyPositions.getSize(); ++j){
-    //    std :: cout << emptyPositions[j] << ' ';
-    //}
-
-
-/*
-    clusterSizeInFS = 3 * sizeof(size_t) + clusterSize;
-
-    firstPositionInFile = fileBeginning;
-    emptyPositions.enqueue(4);
-    emptyPositions.enqueue(24);
-*/
-
-/*
-    emptyPositions.enqueue(52);
-    emptyPositions.enqueue(68);
-    emptyPositions.enqueue(84);
-    emptyPositions.enqueue(101);
-    emptyPositions.enqueue(116);
-*/
 }
 
 FileManager :: ~FileManager(){
@@ -58,34 +30,14 @@ void FileManager :: serialize(){
     }
 
     serialized = serialized + ":";
-/*
-    //make temporary queue, that will be used to save values from empty positions.
-    //write method won`t use them
-    PriorityQueue<size_t> tempQueue;
-    while(!emptyPositions.isEmpty()){
-        tempQueue.enqueue(emptyPositions.dequeue());
-    }
-*/
-
-    //std :: cout << serialized;
 
     size_t positionOfSerializedString = write(serialized.getValue(), serialized.length());
-    //std :: cout << "\npositionOfSerializedString" << positionOfSerializedString << "\n";
-//    sourceFile.seekg(endOfFile());
-
 
     sourceFile.seekg(0);
     sourceFile.write((char *) &positionOfSerializedString, sizeof(size_t));
-/*
-    while(!tempQueue.isEmpty()){
-        emptyPositions.enqueue(tempQueue.dequeue());
-    }
-*/
 }
 
 void FileManager :: deserialize(){
-    //4:16:2:5:116:101:84:68:52:26
-    //sourceFile.seekg(endOfFile() - (std ::streampos)sizeof(size_t));
     sourceFile.seekg(0);
     size_t positionOfSerializedString;
     //read how long is serialized string
@@ -116,7 +68,6 @@ void FileManager :: deserialize(){
         delimiter = serialized.find(':', i);
         position = Value(serialized, i, delimiter).toNumber();
 
-        //emptyPositions.addAt(0, position);
         emptyPositions.enqueue(position);
     }
 
@@ -175,20 +126,18 @@ size_t FileManager :: write(const char * data, size_t size){
 
     size_t tempSize = size;
     size_t tempClusterSize = clusterSize;
-    //size_t clusterRealSize = sizeof(size_t) * 3 + tempClusterSize;
+
     size_t clusterRealSize = clusterSizeInFS;
     std :: streampos prev = 0;
-    std :: streampos next;// = positionOfFirstCluster + clusterRealSize;
+    std :: streampos next;
 
     if(clustersInSequence){  //clusters are in sequence
         next = positionOfFirstCluster + clusterRealSize;
     }else{                  //clusters are not in sequence
         if(!emptyPositions.isEmpty()){
-            //next = emptyPositions.getAt(0);
             next = emptyPositions.peek();
         }else{
             next = endOfFile();
-            //clustersInSequence = true;
         }
     }
 
@@ -220,19 +169,15 @@ size_t FileManager :: write(const char * data, size_t size){
             next += clusterRealSize;
         }else{
             prev = sourceFile.tellg() - (std :: streampos) clusterSizeInFS;
-            //prev = emptyPositions.removeAt(0);
-            //prev = emptyPositions.dequeue();
 
             if(next == endOfFile()){
                 sourceFile.seekg(endOfFile());
                 next += clusterRealSize;
                 clustersInSequence = true;
             }else{
-                //sourceFile.seekg(next);
                 sourceFile.seekg(emptyPositions.dequeue());
 
                 if(!emptyPositions.isEmpty()){
-                    //next = emptyPositions.getAt(0);
                     next = emptyPositions.peek();
                 }else{
                     next = endOfFile();
@@ -304,63 +249,15 @@ void FileManager :: remove(std::streampos position){
     tempCluster.loadFromFile(sourceFile, position);
     tempCluster.markAsInvalid(sourceFile, position);
 
-    //if(!tempCluster.isValidCluster(sourceFile, position)){
-    //    throw std :: runtime_error("try to remove wrong cluster");
-    //}
-
-    if(!tempCluster.isFirstInSequence()){
-        //throw std :: runtime_error("start removing from not first cluster");
-    }
-
-    //closest position to the end of the file
-    std :: streampos maxPosition = position;
 
     //add clusters from the sequence to the queue of "empty" clusters
     while(!tempCluster.isLastInSequence()) {
-        //emptyPositions.addAt(0, position);
         emptyPositions.enqueue(position);
         position = tempCluster.getNext();
         tempCluster.loadFromFile(sourceFile, position);
         tempCluster.markAsInvalid(sourceFile, position);
-        maxPosition = position > maxPosition ? position : maxPosition;
     }
 
     //add also the last one
-    //emptyPositions.addAt(0, position);
     emptyPositions.enqueue(position);
-
-    /*
-    //go to the last cluster in the file
-    size_t positionOfLastCluster = endOfFile() - (std :: streampos) clusterSizeInFS;
-    tempCluster.loadFromFile(sourceFile, positionOfLastCluster);
-    sourceFile.seekg(positionOfLastCluster);
-
-    size_t newPositionForTheCluster = emptyPositions.getAt(0);
-    size_t oldPositionOfTheCluster = positionOfLastCluster;
-
-    while(oldPositionOfTheCluster > maxPosition && !emptyPositions.isEmpty()){
-
-        if(!tempCluster.isFirstInSequence()){
-            replaceCluster(oldPositionOfTheCluster, newPositionForTheCluster);
-
-//            std :: cout << oldPositionOfTheCluster << ' ' << tempCluster.getData() << std :: endl;
-
-//            std :: cout << "to postions " << newPositionForTheCluster << "\n";
-            newPositionForTheCluster = emptyPositions.getAt(0);
-        }else{
-            break;
-        }
-
-        oldPositionOfTheCluster -= clusterSizeInFS;
-        tempCluster.loadFromFile(sourceFile, oldPositionOfTheCluster);
-    }
-
-    std :: cout << "limit " <<  oldPositionOfTheCluster + clusterSizeInFS << std :: endl;
-
-    std :: cout << "empty positions: \n";
-
-    while (!emptyPositions.isEmpty()) {
-        std :: cout << emptyPositions.getAt(0) << std :: endl;
-
-    }*/
 }
