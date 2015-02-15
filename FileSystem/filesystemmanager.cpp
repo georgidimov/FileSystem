@@ -47,8 +47,8 @@ void FileSystemManager :: printDirectoryInfo(Value path) const{
 void FileSystemManager :: createFile(Value path, Value name){
     fstree.createFile(path, name, fileManager.getEmptyPosition());
 
-    Value serializedFile = fstree.getSerializedFile(path, name);
-    fileManager.write(serializedFile.getValue(), serializedFile.length());
+    //Value serializedFile = fstree.getSerializedFile(path, name);
+    fileManager.write("\0", 1);
 }
 
 
@@ -71,6 +71,16 @@ void FileSystemManager :: copyFile(Value path, Value name, Value newPath){
 
     filePosition = fileManager.write(fileContent.getValue(), fileContent.length());
     fstree.setFilePosition(newPath, name, filePosition);
+}
+
+void FileSystemManager :: appendInFile(Value path, Value name, Value data){
+    size_t filePos = fstree.getFilePosition(path, name);
+    fileManager.append(data.getValue(), data.length(), filePos);
+}
+
+void FileSystemManager :: printFileContent(Value path, Value name) const{
+    size_t filePos = fstree.getFilePosition(path, name);
+    std :: cout << fileManager.read(filePos);
 }
 
 void FileSystemManager :: printFileInfo(Value path, Value name) const{

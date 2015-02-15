@@ -21,6 +21,8 @@ public:
     void renameFile(Value path, Value name, Value newName);
     void moveFile(Value path, Value name, Value newPath);
     void copyFile(Value path, Value name, Value newPath);
+    void appendInFile(Value path, Value name, Value data);
+    void printFileContent(Value path, Value name) const;
     void printFileInfo(Value path, Value name) const;
 
 };
