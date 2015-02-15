@@ -5,7 +5,7 @@ void tst_Directory :: testSingleFolderSerialization(){
     Value serialiazed = dir.serialize();
     time_t currentTime;
     time(&currentTime);
-    Value result = ":44:36:D!rName:1:2:3:";
+    Value result = ":43:36:D!rName:1:2:3:";
     result = result +  Value(currentTime) + ":" + Value(currentTime) + ":0:0";
 
     QCOMPARE(QString(serialiazed.getValue()), QString(result.getValue()));
@@ -27,8 +27,8 @@ void tst_Directory :: testMultipleFoldersSerialization(){
     time_t currentTime;
     time(&currentTime);
     Value time = Value(currentTime) + ":" + Value(currentTime);
-    Value result = ":191:32:dir:0:1:0:";
-    result = result + time + ":2:31:f2:0:0:0:" + time + ":35:f111:0:102:0:" + time + ":1:77:35:subDir:0:5:0:" + time + ":1:31:f3:0:0:0:" + time + ":0";
+    Value result = ":190:32:dir:0:1:0:";
+    result = result + time + ":2:31:f2:0:0:0:" + time + ":35:f111:0:102:0:" + time + ":1:76:35:subDir:0:5:0:" + time + ":1:31:f3:0:0:0:" + time + ":0";
 
     QCOMPARE(QString(serialized.getValue()), QString(result.getValue()));
 
