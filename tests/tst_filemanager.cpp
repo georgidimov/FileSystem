@@ -6,18 +6,18 @@ void tst_FileManager :: testReading(){
     FileManager f(sourceFile, sourceFile.end);
 
     //check reading from first position
-    QString result(f.read(0).getValue());
+    QString result(f.read(4).getValue());
     QCOMPARE(result, QString("123456789"));
 
     //check reading from "random" position
-    result = f.read(48).getValue();
+    result = f.read(44).getValue();
     QCOMPARE(result, QString("someStrangeTextHere"));
 }
 
 
 void tst_FileManager :: testWriting(){
     std :: fstream sourceFile("files/temp_file",
-                              std :: ios :: in | std :: ios :: out | std :: ios :: binary | std :: ios :: trunc);
+                              std :: ios :: in | std :: ios :: out | std :: ios :: binary);
     FileManager f(sourceFile, sourceFile.end);
 
     //check with random text and length
