@@ -14,7 +14,8 @@ class FileManager{
 
     size_t firstPositionInFile;
 
-    List<size_t> emptyPositions;
+    //List<size_t> emptyPositions;
+    PriorityQueue<size_t> emptyPositions;
 
     std :: streampos endOfFile() const;
 
