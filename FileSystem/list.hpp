@@ -4,6 +4,7 @@
 
 template <class T>
 class List{
+protected:
     Node<T> * first;
     Node<T> * last;
 
@@ -270,7 +271,7 @@ typename List<T> :: Iterator & List<T> :: Iterator :: operator ++(int uselessVar
 
 template <class T>
 typename List<T> :: Iterator & List<T> :: Iterator :: operator ++(){
-    ++(*this);
+    return (*this)++;
 }
 
 template <class T>
