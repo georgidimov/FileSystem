@@ -14,7 +14,7 @@ Cluster :: ~Cluster(){
 
 void Cluster :: isValidPositionInFile(std::fstream & file, std::streampos position) const{
     file.seekg(0, file.end);
-    size_t lastPositionInFile = file.tellg();
+    std :: streampos lastPositionInFile = file.tellg();
 
     if(position > lastPositionInFile){
         throw std :: runtime_error("invalid position in file");
