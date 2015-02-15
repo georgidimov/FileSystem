@@ -25,6 +25,7 @@ public:
     void deleteDirectory(Value name);
 
     Directory * detachDirectory(Value name);
+    File * detachFile(Value name);
 
     void setParent(Directory * newParent);
     Directory * getParent() const;

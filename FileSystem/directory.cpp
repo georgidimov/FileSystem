@@ -110,6 +110,19 @@ Directory * Directory :: detachDirectory(Value name){
     throw std :: runtime_error("wrong directory name or path");
 }
 
+File * Directory :: detachFile(Value name){
+    //FIX US!
+    size_t size = files.getSize();
+
+    for(size_t i = 0; i < size; ++i){
+        if(files.getAt(i)->getName() == name){
+            return files.removeAt(i);
+        }
+    }
+
+    throw std :: runtime_error("wrong file name or path");
+}
+
 void Directory :: setParent(Directory * newParent){
     parent = newParent;
 }
