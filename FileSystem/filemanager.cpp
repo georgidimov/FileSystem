@@ -251,6 +251,28 @@ void FileManager :: replaceCluster(std::streampos position, std::streampos newPo
     currentCluster.writeToFile(sourceFile, previousClusterPosition);
 }
 
+void FileManager :: append(const char * data, size_t size, size_t start){
+    Cluster tempCluster(clusterSize);
+    tempCluster.loadFromFile(sourceFile, start);
+
+    while(tempCluster.getNext()){
+        start = tempCluster.getNext();
+        tempCluster.loadFromFile(sourceFile, start);
+    }
+
+    //tempCluster.loadFromFile(sourceFile, start);
+    size_t next = write(data, size);
+
+    tempCluster.loadFromFile(sourceFile, start);
+    tempCluster.setNext(next);
+    tempCluster.writeToFile(sourceFile, start);
+
+    tempCluster.loadFromFile(sourceFile, next);
+    tempCluster.setPrev(start);
+    tempCluster.writeToFile(sourceFile, next);
+}
+
+
 void FileManager :: remove(std::streampos position){
     isValidPositionInFile(position);
 

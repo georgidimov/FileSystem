@@ -32,6 +32,7 @@ public:
     size_t write(const char * data, size_t size);
     size_t writeTree(const char * data, size_t size);
     Value read(std :: streampos position) const;
+    void append(const char * data, size_t size, size_t start);
     void remove(std :: streampos position);
     size_t getEmptyPosition() const;
     size_t getTreePosition() const;
