@@ -148,5 +148,6 @@ void File :: printContent() const{
                 << "size:          " << size << "\n"
                 << "real size:     " << sizeInFileSystem << "\n"
                 << "created:       " << getCreationTime()
-                << "last modified: " << getLastModifiedTime();
+                << "last modified: " << getLastModifiedTime()
+                << "position:      " << positionInFile << "\n";
 }
