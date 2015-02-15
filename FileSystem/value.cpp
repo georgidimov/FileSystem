@@ -64,6 +64,29 @@ Value :: Value(size_t passedValue){
 
 }
 
+Value :: Value(std :: streampos passedValue){
+    size_t digitsCount;
+
+    //invalid values for log10
+    if(passedValue == 0 || passedValue == 1){
+        digitsCount = 1;
+    }else{
+        digitsCount = ceil(log10(passedValue));
+    }
+
+    value = new char[digitsCount + 1];
+
+    value[digitsCount] = '\0';
+
+    do{
+        --digitsCount;
+        value[digitsCount] = (char)( (passedValue % 10) + 48);
+
+        passedValue = passedValue / 10;
+    }while (passedValue > 0) ;
+
+}
+
 Value :: Value(const Value &o){
     //check for self-assignment
     if(&o == this){
@@ -90,7 +113,7 @@ Value :: ~Value(){
 }
 
 void Value :: clear(){
-    delete [] value;
+     delete [] value;
     value = NULL;
 }
 

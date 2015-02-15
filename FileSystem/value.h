@@ -13,6 +13,7 @@ public:
     Value(Value passedValue, size_t end);
     Value(Value passedValue, size_t start, size_t end);
     Value(size_t passedValue);
+    Value(std :: streampos passedValue);
     Value(const Value & o);
     Value & operator=(const Value & o);
     ~Value();
