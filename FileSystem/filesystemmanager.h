@@ -24,5 +24,6 @@ public:
     void appendInFile(Value path, Value name, Value data);
     void printFileContent(Value path, Value name) const;
     void printFileInfo(Value path, Value name) const;
-
+    void exportToFS(Value path, Value name, Value exportPath) const;
+    void importFromFS(Value path, Value name, Value fileInFS);
 };

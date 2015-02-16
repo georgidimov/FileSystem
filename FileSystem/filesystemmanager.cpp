@@ -14,7 +14,7 @@ FileSystemManager :: ~FileSystemManager(){
 
     size_t treePos = fileManager.getTreePosition();
     if(treePos){
-        //fileManager.remove(treePos);
+        fileManager.remove(treePos);
     }
     //std :: cout << serialized << "\n";
     fileManager.writeTree(serialized.getValue(), serialized.length());
@@ -85,5 +85,44 @@ void FileSystemManager :: printFileContent(Value path, Value name) const{
 
 void FileSystemManager :: printFileInfo(Value path, Value name) const{
     fstree.printFileInfo(path, name);
+}
+
+void FileSystemManager :: exportToFS(Value path, Value name, Value exportPath) const{
+    std :: fstream newFile(exportPath.getValue(), std :: ios :: out);
+
+    if(!newFile.is_open()){
+        throw std :: runtime_error("wrong file to export");
+    }
+
+    size_t filePosition = fstree.getFilePosition(path, name);
+    Value content = fileManager.read(filePosition);
+    newFile << content;
+
+    newFile.close();
+}
+
+void FileSystemManager :: importFromFS(Value path, Value name, Value fileInFS){
+    std :: fstream file(fileInFS.getValue(), std :: ios :: in);
+
+    if(!file.is_open()){
+        throw std :: runtime_error("wrong file to export");
+    }
+
+//    size_t filePosition = fstree.getFilePosition(path, name);
+//    Value content = fileManager.read(filePosition);
+///Fix me!
+    createFile(path, name);
+
+    size_t bufferSize = 128;
+    char * buffer = new char[bufferSize];
+
+    while(!file.eof()){
+        file.getline(buffer, bufferSize);
+        appendInFile(path, name, buffer);
+    }
+
+    delete buffer;
+    file.close();
+
 }
 
