@@ -17,7 +17,8 @@ HEADERS += cluster.h file.h filemanager.h value.h \
     file.h \
     directory.h \
     fstree.h \
-    filesystemmanager.h
+    filesystemmanager.h \
+    commadsparser.h
 
 SOURCES += cluster.cpp \
            file.cpp \
@@ -26,4 +27,5 @@ SOURCES += cluster.cpp \
            value.cpp \
     directory.cpp \
     fstree.cpp \
-    filesystemmanager.cpp
+    filesystemmanager.cpp \
+    commadsparser.cpp
