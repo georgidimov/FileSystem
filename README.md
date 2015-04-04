@@ -47,7 +47,7 @@ $ mkdir /home
 > Created directory /home
 
 $ mkdir /home/user
->Created directory /home/user
+> Created directory /home/user
 
 $ touch /home/user/.settings
 > Created empty file .settings under /home/use
@@ -72,8 +72,8 @@ $ move /home/user /home/renamed-user
 
 $ dir /home
 > Contents of /home
-<user>
-Total 1 item(s)
+> <user>
+> Total 1 item(s)
 
 $ exit
 > Bye!
